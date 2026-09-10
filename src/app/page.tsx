@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
-import { calculateStudentTotals } from "@/lib/score-calculator";
-import { Eye } from "lucide-react";
+import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus } from "lucide-react";
 import StudentReportCard from "@/components/StudentReportCard";
-import { Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus } from "lucide-react";
 import { calculateStudentTotal } from "@/lib/utils";
 
 const DRAFT_STORAGE_KEY = "progress_report_unsaved_session";
@@ -167,7 +165,6 @@ export default function HomeSPA() {
   const openNewStudentModal = () => {
     if (!config || config.levels.length === 0) return;
 
-    // Choose active level filter if specific, otherwise default to first available
     const initialLevelId = selectedLevelId !== "ALL" ? selectedLevelId : config.levels[0].id;
     const levelConfig = config.levels.find((l) => l.id === initialLevelId);
 
@@ -183,6 +180,7 @@ export default function HomeSPA() {
       level: initialLevelId,
       subLevel: initialSubLevelId,
       scores: {},
+      syllabi: {},
       totalScore: 0,
       maxPossibleScore: 0,
     };
@@ -194,7 +192,7 @@ export default function HomeSPA() {
     setValidationError(null);
   };
 
-  const handleScoreChange = (fieldId: string, value: string) => {
+  const handleScoreChange = (fieldId: string, value: string, isGradeType = false) => {
     if (activeEditIndex === null || !config || !session?.students) return;
 
     const updatedStudents = [...session.students];
@@ -203,30 +201,45 @@ export default function HomeSPA() {
 
     const trimmed = value.trim();
 
-    // If empty or invalid, clear the entry; otherwise save as number
     if (trimmed === "") {
       delete updatedScores[fieldId];
+    } else if (isGradeType) {
+      updatedScores[fieldId] = trimmed;
     } else {
       const num = Number(trimmed);
       if (!isNaN(num)) {
         updatedScores[fieldId] = num;
       } else {
-        delete updatedScores[fieldId]; // Safety fallback for non-numeric input
+        delete updatedScores[fieldId];
       }
     }
 
-    // Update student scores reference
     student.scores = updatedScores;
-
-    // Find level config to compute accurate totals
     const levelConfig = config.levels.find((l) => l.id === student.level);
 
-    // Calculate live total score and maximum score using utils helper
     const { totalScore, maxPossibleScore } = calculateStudentTotal(student, levelConfig, config);
 
     student.totalScore = totalScore;
     student.maxPossibleScore = maxPossibleScore;
 
+    updatedStudents[activeEditIndex] = student;
+    setSession({ ...session, students: updatedStudents });
+  };
+
+  const handleSyllabusChange = (subjectId: string, value: string) => {
+    if (activeEditIndex === null || !session?.students) return;
+
+    const updatedStudents = [...session.students];
+    const student = { ...updatedStudents[activeEditIndex] };
+    const updatedSyllabi = { ...(student.syllabi || {}) };
+
+    if (value.trim() === "") {
+      delete updatedSyllabi[subjectId];
+    } else {
+      updatedSyllabi[subjectId] = value;
+    }
+
+    student.syllabi = updatedSyllabi;
     updatedStudents[activeEditIndex] = student;
     setSession({ ...session, students: updatedStudents });
   };
@@ -241,10 +254,9 @@ export default function HomeSPA() {
       return false;
     }
 
-    // Validate Subjects and Sub-Categories
     if (levelConfig) {
       for (const sub of levelConfig.subjects) {
-        if (sub.subCategories) {
+        if (sub.subCategories && sub.evaluationType !== "grade") {
           for (const subCat of sub.subCategories) {
             const val = student.scores[subCat.id];
             if (val === undefined) {
@@ -258,11 +270,11 @@ export default function HomeSPA() {
           }
         } else {
           const val = student.scores[sub.id];
-          if (!sub.isOptional && val === undefined) {
+          if (!sub.isOptional && (val === undefined || val === "")) {
             setValidationError(`Mandatory subject '${sub.name}' cannot be empty.`);
             return false;
           }
-          if (typeof val === "number" && (val < 0 || val > sub.maxPoints)) {
+          if (sub.evaluationType !== "grade" && typeof val === "number" && (val < 0 || (sub.maxPoints && val > sub.maxPoints))) {
             setValidationError(`'${sub.name}' must be between 0 and ${sub.maxPoints}.`);
             return false;
           }
@@ -270,7 +282,6 @@ export default function HomeSPA() {
       }
     }
 
-    // Validate Co-Curricular Activities (Fixed maxPoints bug)
     if (config.coCurricular?.activities) {
       for (const act of config.coCurricular.activities) {
         const val = student.scores[act.id];
@@ -290,7 +301,6 @@ export default function HomeSPA() {
     }
 
     if (addAnother) {
-      // Re-initialize modal state for next entry using same level context
       const newStudent: StudentScore = {
         studentId: `std_${Date.now()}`,
         firstName: "",
@@ -298,6 +308,7 @@ export default function HomeSPA() {
         level: student.level,
         subLevel: student.subLevel,
         scores: {},
+        syllabi: {},
         totalScore: 0,
         maxPossibleScore: 0,
       };
@@ -328,7 +339,6 @@ export default function HomeSPA() {
 
   const currentStudents = Array.isArray(session?.students) ? session.students : [];
 
-  // Apply Filter Controls
   const filteredStudents = currentStudents.filter((std) => {
     if (selectedLevelId !== "ALL" && std.level !== selectedLevelId) return false;
     if (selectedSubLevelId !== "ALL" && std.subLevel !== selectedSubLevelId) return false;
@@ -403,7 +413,6 @@ export default function HomeSPA() {
             />
           </div>
 
-          {/* Level Filter Dropdowns */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 bg-gray-50 p-1 border rounded">
               <span className="text-xs text-gray-500 px-2 font-medium">Filter:</span>
@@ -442,7 +451,6 @@ export default function HomeSPA() {
             >
               <UserPlus size={16} /> Add Student Result
             </button>
-
           </div>
         </div>
 
@@ -492,7 +500,6 @@ export default function HomeSPA() {
                         {std.totalScore} / {std.maxPossibleScore}
                       </td>
                       <td className="p-4 text-right space-x-2">
-                        {/* Preview & Print Button */}
                         <button
                           onClick={() => setSelectedPrintStudent(std)}
                           className="p-1 border rounded hover:bg-blue-50 text-blue-600"
@@ -590,7 +597,12 @@ export default function HomeSPA() {
                     student.subLevel = updatedLevel?.subLevels?.length
                       ? updatedLevel.subLevels[0].id
                       : undefined;
-                    updated[activeEditIndex] = calculateStudentTotals(student, config);
+
+                    const { totalScore, maxPossibleScore } = calculateStudentTotal(student, updatedLevel, config);
+                    student.totalScore = totalScore;
+                    student.maxPossibleScore = maxPossibleScore;
+
+                    updated[activeEditIndex] = student;
                     setSession({ ...session, students: updated });
                   }}
                   className="w-full border p-1.5 rounded text-sm bg-white"
@@ -629,45 +641,88 @@ export default function HomeSPA() {
             {/* Block by Block Subject Section */}
             {currentLevelConfig && (
               <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
-                {currentLevelConfig.subjects.map((sub) => (
-                  <div key={sub.id} className="border rounded-lg p-3 bg-gray-50/50 space-y-2">
-                    <h4 className="font-semibold text-sm text-gray-800 border-b pb-1">
-                      {sub.name}
-                    </h4>
+                {currentLevelConfig.subjects.map((sub) => {
+                  const isGrade = sub.evaluationType === "grade";
 
-                    {sub.subCategories ? (
-                      <div className="grid grid-cols-2 gap-3">
-                        {sub.subCategories.map((subCat) => (
-                          <div key={subCat.id} className="bg-white p-2 rounded border">
-                            <label className="text-xs font-medium block text-gray-700">
-                              {subCat.name} (Max {subCat.maxPoints}) *
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Points or n.z."
-                              value={currentStudent.scores[subCat.id] ?? ""}
-                              onChange={(e) => handleScoreChange(subCat.id, e.target.value)}
-                              className="w-full border p-1 rounded mt-1 text-sm"
-                            />
-                          </div>
-                        ))}
+                  return (
+                    <div key={sub.id} className="border rounded-lg p-3 bg-gray-50/50 space-y-2">
+                      <div className="flex items-center justify-between border-b pb-1">
+                        <h4 className="font-semibold text-sm text-gray-800">{sub.name}</h4>
+                        {isGrade && (
+                          <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
+                            Grade Evaluation
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="bg-white p-2 rounded border max-w-sm">
-                        <label className="text-xs font-medium block text-gray-700">
-                          {sub.name} Score (Max {sub.maxPoints}) {!sub.isOptional && "*"}
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Points or n.z."
-                          value={currentStudent.scores[sub.id] ?? ""}
-                          onChange={(e) => handleScoreChange(sub.id, e.target.value)}
-                          className="w-full border p-1 rounded mt-1 text-sm"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
+
+                      {isGrade ? (
+                        <div className="bg-white p-2 rounded border max-w-sm">
+                          <label className="text-xs font-medium block text-gray-700 mb-1">
+                            Select Grade {!sub.isOptional && "*"}
+                          </label>
+                          <select
+                            value={String(currentStudent.scores[sub.id] ?? "")}
+                            onChange={(e) => handleScoreChange(sub.id, e.target.value, true)}
+                            className="w-full border p-1 rounded text-sm bg-white font-medium"
+                          >
+                            <option value="">Select Grade...</option>
+                            {sub.gradeOptions?.map((grade) => (
+                              <option key={grade} value={grade}>
+                                {grade}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : sub.subCategories ? (
+                        <div className="grid grid-cols-2 gap-3">
+                          {sub.subCategories.map((subCat) => (
+                            <div key={subCat.id} className="bg-white p-2 rounded border">
+                              <label className="text-xs font-medium block text-gray-700">
+                                {subCat.name} (Max {subCat.maxPoints}) *
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Points or n.z."
+                                value={currentStudent.scores[subCat.id] ?? ""}
+                                onChange={(e) => handleScoreChange(subCat.id, e.target.value)}
+                                className="w-full border p-1 rounded mt-1 text-sm"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="bg-white p-2 rounded border max-w-sm">
+                          <label className="text-xs font-medium block text-gray-700">
+                            {sub.name} Score (Max {sub.maxPoints}) {!sub.isOptional && "*"}
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Points or n.z."
+                            value={currentStudent.scores[sub.id] ?? ""}
+                            onChange={(e) => handleScoreChange(sub.id, e.target.value)}
+                            className="w-full border p-1 rounded mt-1 text-sm"
+                          />
+                        </div>
+                      )}
+
+                      {/* Custom Syllabus Text Input Field */}
+                      {sub.hasCustomSyllabus && (
+                        <div className="pt-2 border-t border-gray-200">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block mb-1">
+                            Lehrplan / Custom Syllabus
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Juz 29 - Surah Al-Mulk, Verses 1-15"
+                            value={currentStudent.syllabi?.[sub.id] ?? ""}
+                            onChange={(e) => handleSyllabusChange(sub.id, e.target.value)}
+                            className="w-full border p-1.5 rounded text-xs bg-white"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
 
                 {/* Co-Curricular Block */}
                 {config.coCurricular?.activities && config.coCurricular.activities.length > 0 && (

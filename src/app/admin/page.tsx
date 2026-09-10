@@ -72,6 +72,7 @@ export default function AdminPage() {
                     id: `sub_cp_${timestamp}`,
                     name: "Class Performance",
                     maxPoints: 100,
+                    evaluationType: "points",
                     isOptional: false,
                     includeInTotal: true,
                     subCategories: [
@@ -85,6 +86,7 @@ export default function AdminPage() {
                     id: `sub_ai_${timestamp}`,
                     name: "Allgemein Islam",
                     maxPoints: 100,
+                    evaluationType: "points",
                     isOptional: false,
                     includeInTotal: true,
                     subCategories: [
@@ -98,6 +100,7 @@ export default function AdminPage() {
                     id: `sub_qn_${timestamp}`,
                     name: "Qaida Nooraniyah",
                     maxPoints: 100,
+                    evaluationType: "points",
                     isOptional: false,
                     includeInTotal: true,
                     subCategories: [
@@ -154,6 +157,9 @@ export default function AdminPage() {
             id: `sub_${Date.now()}`,
             name: "New Subject",
             maxPoints: 100,
+            evaluationType: "points",
+            gradeOptions: ["Sehr Gut", "Gut", "Befriedigend", "Ausreichend", "Mangelhaft"],
+            hasCustomSyllabus: false,
             isOptional: false,
             includeInTotal: true,
         };
@@ -441,7 +447,7 @@ export default function AdminPage() {
                                                 )}
                                             </div>
 
-                                            {/* Subjects Section */}
+                                            {/* Shared Subjects & Criteria */}
                                             <div className="space-y-4">
                                                 <div className="flex justify-between items-center border-b pb-1">
                                                     <h4 className="text-xs font-bold uppercase tracking-wider text-gray-600">
@@ -456,126 +462,194 @@ export default function AdminPage() {
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    {level.subjects.map((sub, subIdx) => (
-                                                        <div key={sub.id} className="bg-white p-4 rounded-lg border shadow-xs space-y-3">
-                                                            <div className="flex items-center justify-between gap-4">
-                                                                <input
-                                                                    type="text"
-                                                                    value={sub.name}
-                                                                    onChange={(e) => {
-                                                                        const updated = [...config.levels];
-                                                                        updated[lvlIdx].subjects[subIdx].name = e.target.value;
-                                                                        setConfig({ ...config, levels: updated });
-                                                                    }}
-                                                                    className="border p-1.5 rounded text-sm font-medium flex-1"
-                                                                    placeholder="Subject Name"
-                                                                />
+                                                    {level.subjects.map((sub, subIdx) => {
+                                                        const isGrade = sub.evaluationType === "grade";
 
-                                                                <div className="flex items-center gap-2">
-                                                                    <label className="text-xs text-gray-600 font-medium">Max Pts:</label>
+                                                        return (
+                                                            <div key={sub.id} className="bg-white p-4 rounded-lg border shadow-xs space-y-3">
+                                                                <div className="flex items-center justify-between gap-4">
                                                                     <input
-                                                                        type="number"
-                                                                        value={sub.maxPoints}
+                                                                        type="text"
+                                                                        value={sub.name}
                                                                         onChange={(e) => {
                                                                             const updated = [...config.levels];
-                                                                            updated[lvlIdx].subjects[subIdx].maxPoints = Number(e.target.value);
+                                                                            updated[lvlIdx].subjects[subIdx].name = e.target.value;
                                                                             setConfig({ ...config, levels: updated });
                                                                         }}
-                                                                        className="border p-1.5 rounded text-sm w-20"
+                                                                        className="border p-1.5 rounded text-sm font-medium flex-1"
+                                                                        placeholder="Subject Name (e.g. Hifz)"
                                                                     />
-                                                                </div>
 
-                                                                <button
-                                                                    onClick={() => handleRemoveSubject(lvlIdx, subIdx)}
-                                                                    className="p-1.5 text-red-500 hover:bg-red-50 rounded"
-                                                                    title="Remove Subject"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
-                                                            </div>
+                                                                    {/* Evaluation Type Selector */}
+                                                                    <div className="flex items-center gap-2">
+                                                                        <label className="text-xs text-gray-600 font-medium">Type:</label>
+                                                                        <select
+                                                                            value={sub.evaluationType || "points"}
+                                                                            onChange={(e) => {
+                                                                                const updated = [...config.levels];
+                                                                                updated[lvlIdx].subjects[subIdx].evaluationType = e.target.value as "points" | "grade";
+                                                                                setConfig({ ...config, levels: updated });
+                                                                            }}
+                                                                            className="border p-1.5 rounded text-xs bg-white"
+                                                                        >
+                                                                            <option value="points">Points</option>
+                                                                            <option value="grade">Grade (Dropdown)</option>
+                                                                        </select>
+                                                                    </div>
 
-                                                            <div className="flex items-center gap-6 text-xs text-gray-700 pt-1 border-t">
-                                                                <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={sub.includeInTotal}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...config.levels];
-                                                                            updated[lvlIdx].subjects[subIdx].includeInTotal = e.target.checked;
-                                                                            setConfig({ ...config, levels: updated });
-                                                                        }}
-                                                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                                    />
-                                                                    Include in Total Score
-                                                                </label>
-
-                                                                <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        checked={sub.isOptional}
-                                                                        onChange={(e) => {
-                                                                            const updated = [...config.levels];
-                                                                            updated[lvlIdx].subjects[subIdx].isOptional = e.target.checked;
-                                                                            setConfig({ ...config, levels: updated });
-                                                                        }}
-                                                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                                    />
-                                                                    Optional Subject
-                                                                </label>
-
-                                                                <button
-                                                                    onClick={() => handleAddSubCategory(lvlIdx, subIdx)}
-                                                                    className="ml-auto text-xs text-blue-600 hover:underline flex items-center gap-1 font-medium"
-                                                                >
-                                                                    <Plus size={12} /> Add Sub-Category
-                                                                </button>
-                                                            </div>
-
-                                                            {sub.subCategories && sub.subCategories.length > 0 && (
-                                                                <div className="bg-gray-50 p-3 rounded border space-y-2 ml-4">
-                                                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
-                                                                        Sub-Categories / Criteria
-                                                                    </span>
-                                                                    {sub.subCategories.map((subCat, catIdx) => (
-                                                                        <div key={subCat.id} className="flex items-center gap-3">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={subCat.name}
-                                                                                onChange={(e) => {
-                                                                                    const updated = [...config.levels];
-                                                                                    if (updated[lvlIdx].subjects[subIdx].subCategories) {
-                                                                                        updated[lvlIdx].subjects[subIdx].subCategories![catIdx].name = e.target.value;
-                                                                                    }
-                                                                                    setConfig({ ...config, levels: updated });
-                                                                                }}
-                                                                                className="border p-1 rounded text-xs flex-1 bg-white"
-                                                                                placeholder="Sub-Category Name"
-                                                                            />
+                                                                    {/* Max Points (Only for Points type) */}
+                                                                    {!isGrade && (
+                                                                        <div className="flex items-center gap-2">
+                                                                            <label className="text-xs text-gray-600 font-medium">Max Pts:</label>
                                                                             <input
                                                                                 type="number"
-                                                                                value={subCat.maxPoints}
+                                                                                value={sub.maxPoints || 100}
                                                                                 onChange={(e) => {
                                                                                     const updated = [...config.levels];
-                                                                                    if (updated[lvlIdx].subjects[subIdx].subCategories) {
-                                                                                        updated[lvlIdx].subjects[subIdx].subCategories![catIdx].maxPoints = Number(e.target.value);
-                                                                                    }
+                                                                                    updated[lvlIdx].subjects[subIdx].maxPoints = Number(e.target.value);
                                                                                     setConfig({ ...config, levels: updated });
                                                                                 }}
-                                                                                className="border p-1 rounded text-xs w-16 bg-white"
-                                                                                placeholder="Max"
+                                                                                className="border p-1.5 rounded text-sm w-20"
                                                                             />
-                                                                            <button
-                                                                                onClick={() => handleRemoveSubCategory(lvlIdx, subIdx, catIdx)}
-                                                                                className="text-red-500 hover:text-red-700 p-1"
-                                                                            >
-                                                                                <Trash2 size={14} />
-                                                                            </button>
                                                                         </div>
-                                                                    ))}
+                                                                    )}
+
+                                                                    <button
+                                                                        onClick={() => handleRemoveSubject(lvlIdx, subIdx)}
+                                                                        className="p-1.5 text-red-500 hover:bg-red-50 rounded"
+                                                                        title="Remove Subject"
+                                                                    >
+                                                                        <Trash2 size={16} />
+                                                                    </button>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    ))}
+
+                                                                {/* Grade Options Input (When Type = Grade) */}
+                                                                {isGrade && (
+                                                                    <div className="bg-amber-50/50 p-2.5 rounded border border-amber-200 flex items-center gap-3">
+                                                                        <label className="text-xs font-semibold text-amber-800 whitespace-nowrap">
+                                                                            Grade Options (comma-separated):
+                                                                        </label>
+                                                                        <input
+                                                                            type="text"
+                                                                            value={sub.gradeOptions ? sub.gradeOptions.join(", ") : ""}
+                                                                            onChange={(e) => {
+                                                                                const updated = [...config.levels];
+                                                                                updated[lvlIdx].subjects[subIdx].gradeOptions = e.target.value
+                                                                                    .split(",")
+                                                                                    .map((g) => g.trim())
+                                                                                    .filter(Boolean);
+                                                                                setConfig({ ...config, levels: updated });
+                                                                            }}
+                                                                            className="border p-1 rounded text-xs flex-1 bg-white"
+                                                                            placeholder="e.g. Sehr Gut, Gut, Befriedigend, Ausreichend"
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Configuration Checkboxes */}
+                                                                <div className="flex items-center gap-6 text-xs text-gray-700 pt-1 border-t">
+                                                                    {/* Syllabus Toggle */}
+                                                                    <label className="flex items-center gap-1.5 cursor-pointer select-none font-medium text-emerald-700">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={sub.hasCustomSyllabus || false}
+                                                                            onChange={(e) => {
+                                                                                const updated = [...config.levels];
+                                                                                updated[lvlIdx].subjects[subIdx].hasCustomSyllabus = e.target.checked;
+                                                                                setConfig({ ...config, levels: updated });
+                                                                            }}
+                                                                            className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                                                        />
+                                                                        Enable Custom Syllabus (Lehrplan)
+                                                                    </label>
+
+                                                                    {!isGrade && (
+                                                                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                checked={sub.includeInTotal}
+                                                                                onChange={(e) => {
+                                                                                    const updated = [...config.levels];
+                                                                                    updated[lvlIdx].subjects[subIdx].includeInTotal = e.target.checked;
+                                                                                    setConfig({ ...config, levels: updated });
+                                                                                }}
+                                                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                                            />
+                                                                            Include in Total Score
+                                                                        </label>
+                                                                    )}
+
+                                                                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={sub.isOptional}
+                                                                            onChange={(e) => {
+                                                                                const updated = [...config.levels];
+                                                                                updated[lvlIdx].subjects[subIdx].isOptional = e.target.checked;
+                                                                                setConfig({ ...config, levels: updated });
+                                                                            }}
+                                                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                                        />
+                                                                        Optional Subject
+                                                                    </label>
+
+                                                                    {!isGrade && (
+                                                                        <button
+                                                                            onClick={() => handleAddSubCategory(lvlIdx, subIdx)}
+                                                                            className="ml-auto text-xs text-blue-600 hover:underline flex items-center gap-1 font-medium"
+                                                                        >
+                                                                            <Plus size={12} /> Add Sub-Category
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Sub-Categories */}
+                                                                {!isGrade && sub.subCategories && sub.subCategories.length > 0 && (
+                                                                    <div className="bg-gray-50 p-3 rounded border space-y-2 ml-4">
+                                                                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider block">
+                                                                            Sub-Categories / Criteria
+                                                                        </span>
+                                                                        {sub.subCategories.map((subCat, catIdx) => (
+                                                                            <div key={subCat.id} className="flex items-center gap-3">
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={subCat.name}
+                                                                                    onChange={(e) => {
+                                                                                        const updated = [...config.levels];
+                                                                                        if (updated[lvlIdx].subjects[subIdx].subCategories) {
+                                                                                            updated[lvlIdx].subjects[subIdx].subCategories![catIdx].name = e.target.value;
+                                                                                        }
+                                                                                        setConfig({ ...config, levels: updated });
+                                                                                    }}
+                                                                                    className="border p-1 rounded text-xs flex-1 bg-white"
+                                                                                    placeholder="Sub-Category Name"
+                                                                                />
+                                                                                <input
+                                                                                    type="number"
+                                                                                    value={subCat.maxPoints}
+                                                                                    onChange={(e) => {
+                                                                                        const updated = [...config.levels];
+                                                                                        if (updated[lvlIdx].subjects[subIdx].subCategories) {
+                                                                                            updated[lvlIdx].subjects[subIdx].subCategories![catIdx].maxPoints = Number(e.target.value);
+                                                                                        }
+                                                                                        setConfig({ ...config, levels: updated });
+                                                                                    }}
+                                                                                    className="border p-1 rounded text-xs w-16 bg-white"
+                                                                                    placeholder="Max"
+                                                                                />
+                                                                                <button
+                                                                                    onClick={() => handleRemoveSubCategory(lvlIdx, subIdx, catIdx)}
+                                                                                    className="text-red-500 hover:text-red-700 p-1"
+                                                                                >
+                                                                                    <Trash2 size={14} />
+                                                                                </button>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>

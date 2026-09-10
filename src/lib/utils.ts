@@ -10,7 +10,7 @@ export function calculateStudentTotal(
 
   if (!levelConfig) return { totalScore, maxPossibleScore };
 
-  // Helper to safely check if a score is entered and valid
+  // Helper to safely check if a numerical score is entered and valid
   const hasValidScore = (scoreVal: unknown): boolean => {
     return (
       scoreVal !== undefined &&
@@ -22,6 +22,9 @@ export function calculateStudentTotal(
 
   // 1. Process Standard / Mandatory & Optional Subjects in `subjects` array
   levelConfig.subjects?.forEach((sub) => {
+    // Skip subjects evaluated by grades rather than points
+    if (sub.evaluationType === "grade") return;
+
     const hasScore =
       sub.subCategories && sub.subCategories.length > 0
         ? sub.subCategories.some((sc) => hasValidScore(student.scores?.[sc.id]))
@@ -49,6 +52,8 @@ export function calculateStudentTotal(
 
   // 2. Process Separate Optional Subjects Array (if present)
   levelConfig.optionalSubjects?.forEach((optSub) => {
+    if (optSub.evaluationType === "grade") return;
+
     const rawVal = student.scores?.[optSub.id];
     const hasScore = hasValidScore(rawVal);
 
@@ -61,7 +66,6 @@ export function calculateStudentTotal(
   });
 
   // 3. Process Co-Curricular Scores & Max Points
-  // Check student.coCurricularScores object
   if (student.coCurricularScores) {
     Object.values(student.coCurricularScores).forEach((scoreVal) => {
       totalScore += Number(scoreVal) || 0;
@@ -73,12 +77,10 @@ export function calculateStudentTotal(
   coActivities.forEach((act) => {
     const rawVal = student.scores?.[act.id];
 
-    // If score is stored directly inside `student.scores` instead of `coCurricularScores`
     if (!student.coCurricularScores?.[act.id] && hasValidScore(rawVal)) {
       totalScore += Number(rawVal) || 0;
     }
 
-    // ALWAYS add activity max points to maxPossibleScore (if not using baseMaxScore)
     if (!levelConfig.baseMaxScore) {
       maxPossibleScore += act.maxPoints || 0;
     }

@@ -152,41 +152,56 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                 </thead>
                                 <tbody>
                                     {/* Standard Subjects */}
-                                    {levelConfig?.subjects.map((sub) => (
-                                        <React.Fragment key={sub.id}>
-                                            {sub.subCategories ? (
-                                                <>
-                                                    <tr className="bg-[#005C3C]/10 text-[#005C3C]">
-                                                        <td colSpan={2} className="border border-[#005C3C] px-2.5 py-1 font-sans font-bold tracking-wider text-[10px]">
-                                                            {translateSubject(sub.name)}
+                                    {levelConfig?.subjects.map((sub) => {
+                                        const isGrade = sub.evaluationType === "grade";
+
+                                        return (
+                                            <React.Fragment key={sub.id}>
+                                                {sub.subCategories && !isGrade ? (
+                                                    <>
+                                                        <tr className="bg-[#005C3C]/10 text-[#005C3C]">
+                                                            <td colSpan={2} className="border border-[#005C3C] px-2.5 py-1 font-sans font-bold tracking-wider text-[10px]">
+                                                                {translateSubject(sub.name)}
+                                                            </td>
+                                                        </tr>
+                                                        {sub.subCategories.map((subCat, cIdx) => {
+                                                            const scoreVal = student.scores[subCat.id];
+                                                            return (
+                                                                <tr key={subCat.id} className={cIdx % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
+                                                                    <td className="border border-[#005C3C] px-3 py-1 font-sans pl-5 text-[11px]">
+                                                                        {subCat.name} ({subCat.maxPoints}P)
+                                                                    </td>
+                                                                    <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
+                                                                        {scoreVal !== undefined ? scoreVal : "-"}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </>
+                                                ) : (
+                                                    <tr className="bg-white">
+                                                        <td className="border border-[#005C3C] px-2.5 py-1 font-sans font-medium text-[11px]">
+                                                            <div>
+                                                                {translateSubject(sub.name)}
+                                                                {!isGrade && sub.maxPoints ? ` (${sub.maxPoints}P)` : ""}
+                                                            </div>
+                                                            {/* Render Custom Syllabus under subject name */}
+                                                            {sub.hasCustomSyllabus && student.syllabi?.[sub.id] && (
+                                                                <div className="text-[10px] text-emerald-800 italic font-serif leading-tight mt-0.5">
+                                                                    Lehrplan: {student.syllabi[sub.id]}
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
+                                                            {student.scores[sub.id] !== undefined && student.scores[sub.id] !== ""
+                                                                ? student.scores[sub.id]
+                                                                : "-"}
                                                         </td>
                                                     </tr>
-                                                    {sub.subCategories.map((subCat, cIdx) => {
-                                                        const scoreVal = student.scores[subCat.id];
-                                                        return (
-                                                            <tr key={subCat.id} className={cIdx % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
-                                                                <td className="border border-[#005C3C] px-3 py-1 font-sans pl-5 text-[11px]">
-                                                                    {subCat.name} ({subCat.maxPoints}P)
-                                                                </td>
-                                                                <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
-                                                                    {scoreVal !== undefined ? scoreVal : "-"}
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </>
-                                            ) : (
-                                                <tr className="bg-white">
-                                                    <td className="border border-[#005C3C] px-2.5 py-1 font-sans font-medium text-[11px]">
-                                                        {translateSubject(sub.name)} ({sub.maxPoints}P)
-                                                    </td>
-                                                    <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
-                                                        {student.scores[sub.id] !== undefined ? student.scores[sub.id] : "-"}
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </React.Fragment>
-                                    ))}
+                                                )}
+                                            </React.Fragment>
+                                        );
+                                    })}
 
                                     {/* Optional Subjects Block */}
                                     {activeOptionalSubjects.length > 0 && (
@@ -196,16 +211,29 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                                     Wahlfächer (Optional Subjects)
                                                 </td>
                                             </tr>
-                                            {activeOptionalSubjects.map((opt, oIdx) => (
-                                                <tr key={opt.id} className={oIdx % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
-                                                    <td className="border border-[#005C3C] px-3 py-1 font-sans pl-5 text-[11px]">
-                                                        {opt.name} ({opt.maxPoints}P)
-                                                    </td>
-                                                    <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
-                                                        {student.scores[opt.id] !== undefined ? student.scores[opt.id] : "-"}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                            {activeOptionalSubjects.map((opt, oIdx) => {
+                                                const isGrade = opt.evaluationType === "grade";
+                                                return (
+                                                    <tr key={opt.id} className={oIdx % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
+                                                        <td className="border border-[#005C3C] px-3 py-1 font-sans pl-5 text-[11px]">
+                                                            <div>
+                                                                {opt.name}
+                                                                {!isGrade && opt.maxPoints ? ` (${opt.maxPoints}P)` : ""}
+                                                            </div>
+                                                            {opt.hasCustomSyllabus && student.syllabi?.[opt.id] && (
+                                                                <div className="text-[10px] text-emerald-800 italic font-serif leading-tight mt-0.5">
+                                                                    Lehrplan: {student.syllabi[opt.id]}
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="border border-[#005C3C] px-2 py-1 text-center font-bold w-20 text-xs">
+                                                            {student.scores[opt.id] !== undefined && student.scores[opt.id] !== ""
+                                                                ? student.scores[opt.id]
+                                                                : "-"}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </>
                                     )}
 
@@ -236,7 +264,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                             Gesamtpunkte
                                         </td>
                                         <td className="border border-[#005C3C] px-2 py-1.5 text-center text-[#005C3C] text-xs">
-                                            {totalScore}
+                                            {totalScore} / {maxPossibleScore}
                                         </td>
                                     </tr>
                                 </tbody>

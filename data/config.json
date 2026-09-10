@@ -96,7 +96,8 @@
           "name": "Auswendiglernen",
           "maxPoints": 100,
           "isOptional": false,
-          "includeInTotal": true
+          "includeInTotal": true,
+          "hasCustomSyllabus": true
         },
         {
           "id": "sub_1788864161088",
@@ -281,7 +282,13 @@
           "name": "Bangla",
           "maxPoints": 100,
           "isOptional": true,
-          "includeInTotal": false
+          "includeInTotal": false,
+          "evaluationType": "grade",
+          "gradeOptions": [
+            "Sehr Gut",
+            "Gut",
+            "Ausreichend"
+          ]
         },
         {
           "id": "sub_1789033549108",

@@ -45,7 +45,10 @@
         "islamische_bildung": 25
       },
       "totalScore": 400,
-      "maxPossibleScore": 450
+      "maxPossibleScore": 450,
+      "syllabi": {
+        "sub_1788864142240": "Juz 29 bis 30"
+      }
     },
     {
       "studentId": "std_1789035861611",
@@ -70,7 +73,7 @@
         "garden_day": 25,
         "science_club": 25,
         "islamische_bildung": 25,
-        "sub_1788982008540": 98,
+        "sub_1788982008540": "Sehr Gut",
         "sub_1789033549108": 94
       },
       "totalScore": 373,
@@ -143,7 +146,9 @@
         "sports_day": 25,
         "garden_day": 25,
         "science_club": 25,
-        "islamische_bildung": 25
+        "islamische_bildung": 25,
+        "sub_1788982008540": "Sehr Gut",
+        "sub_1789033549108": 89
       },
       "totalScore": 376,
       "maxPossibleScore": 400

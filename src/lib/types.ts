@@ -1,3 +1,5 @@
+export type EvaluationType = "points" | "grade";
+
 // 1. Base Sub-Structures
 export interface SubCategory {
   id: string;
@@ -19,6 +21,9 @@ export interface SubjectConfig {
   subCategories?: SubCategory[];
   isOptional?: boolean;
   includeInTotal?: boolean;
+  evaluationType?: EvaluationType;
+  gradeOptions?: string[];         // e.g., ["A+", "A", "B", "C", "D", "F"] or ["Sehr Gut", "Gut", "Befriedigend"]
+  hasCustomSyllabus?: boolean;
 }
 
 // 3. Level Configuration (Defined BEFORE AppConfig)
@@ -61,10 +66,11 @@ export interface StudentScore {
   familyName: string;
   level: string;
   subLevel?: string;
-  scores: Record<string, number>;
+  scores: Record<string, number | string>;
   coCurricularScores?: Record<string, number>;
   totalScore: number;
   maxPossibleScore: number;
+  syllabi?: Record<string, string>;
 }
 
 export interface ExamSession {
