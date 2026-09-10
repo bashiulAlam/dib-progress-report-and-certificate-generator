@@ -27,30 +27,6 @@
       "maxPossibleScore": 600
     },
     {
-      "studentId": "std_1788981638689",
-      "firstName": "Nishaj Araf",
-      "familyName": "Nasir",
-      "level": "lvl_1788864109056",
-      "scores": {
-        "sub_1788864142240": 78,
-        "sub_1788864161088": 84,
-        "sub_1788864174755": 40,
-        "subcat_punkt_1788864109056": 25,
-        "subcat_hw_1788864109056": 24,
-        "subcat_mitarb_1788864109056": 24,
-        "subcat_adhab_1788864109056": 25,
-        "sports_day": 25,
-        "garden_day": 25,
-        "science_club": 25,
-        "islamische_bildung": 25
-      },
-      "totalScore": 400,
-      "maxPossibleScore": 450,
-      "syllabi": {
-        "sub_1788864142240": "Juz 29 bis 30"
-      }
-    },
-    {
       "studentId": "std_1789035861611",
       "firstName": "Faiyaz",
       "familyName": "Karim",
@@ -198,6 +174,36 @@
       },
       "totalScore": 395,
       "maxPossibleScore": 450
+    },
+    {
+      "studentId": "std_1789064495689",
+      "firstName": "Fahed",
+      "familyName": "Islam",
+      "level": "noorani",
+      "subLevel": "nl_3",
+      "scores": {
+        "subcat_ai_f1": 22,
+        "subcat_ai_f2": 21,
+        "subcat_ai_f3": 18,
+        "subcat_ai_f4": 20,
+        "subcat_qn_f1": 24,
+        "subcat_qn_f2": 21,
+        "subcat_qn_f3": 19,
+        "subcat_qn_f4": 18,
+        "sub_1788982008540": "Gut",
+        "subcat_punkt": 20,
+        "subcat_mitarb": 25,
+        "subcat_hw": 21,
+        "subcat_adhab": 25,
+        "sub_1789033549108": 80,
+        "sports_day": 0,
+        "garden_day": 25,
+        "science_club": 25,
+        "islamische_bildung": 25
+      },
+      "syllabi": {},
+      "totalScore": 329,
+      "maxPossibleScore": 400
     }
   ]
 }

@@ -311,11 +311,6 @@
         "maxPoints": 25
       },
       {
-        "id": "garden_day",
-        "name": "Garden Day",
-        "maxPoints": 25
-      },
-      {
         "id": "science_club",
         "name": "Science Club Event",
         "maxPoints": 25
@@ -323,6 +318,11 @@
       {
         "id": "islamische_bildung",
         "name": "Islamische Bildung Project",
+        "maxPoints": 25
+      },
+      {
+        "id": "co_1789064756155",
+        "name": "Workshop",
         "maxPoints": 25
       }
     ]

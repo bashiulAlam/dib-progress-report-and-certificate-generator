@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
-import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus } from "lucide-react";
+import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus, AlertTriangle } from "lucide-react";
 import StudentReportCard from "@/components/StudentReportCard";
 import { calculateStudentTotal } from "@/lib/utils";
 
@@ -49,6 +49,9 @@ export default function HomeSPA() {
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [activeEditIndex, setActiveEditIndex] = useState<number | null>(null);
   const [isNewStudent, setIsNewStudent] = useState(false);
+  
+  // State for delete confirmation modal
+  const [studentToDeleteIndex, setStudentToDeleteIndex] = useState<number | null>(null);
 
   // Filter states for table list & default creation
   const [selectedLevelId, setSelectedLevelId] = useState<string>("ALL");
@@ -160,6 +163,23 @@ export default function HomeSPA() {
     } catch (err) {
       console.error("Failed to delete file:", err);
     }
+  };
+
+  const confirmDeleteStudent = async () => {
+    if (studentToDeleteIndex === null) return;
+
+    const currentStudents = Array.isArray(session?.students) ? session.students : [];
+    const updated = currentStudents.filter((_, i) => i !== studentToDeleteIndex);
+    const updatedSession = { ...session, students: updated };
+    
+    setSession(updatedSession);
+    
+    const currentFileName = getFileNameFromTerm(session.term);
+    if (currentFileName) {
+      await saveSessionToFile(updatedSession, currentFileName);
+    }
+
+    setStudentToDeleteIndex(null);
   };
 
   const openNewStudentModal = () => {
@@ -358,6 +378,11 @@ export default function HomeSPA() {
 
   const activeDisplayFile = getFileNameFromTerm(session.term) || activeFileName || "Unsaved";
 
+  const studentPendingDelete =
+    studentToDeleteIndex !== null && studentToDeleteIndex < currentStudents.length
+      ? currentStudents[studentToDeleteIndex]
+      : null;
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       {/* Header Bar */}
@@ -526,16 +551,9 @@ export default function HomeSPA() {
                           <Edit3 size={16} />
                         </button>
                         <button
-                          onClick={async () => {
-                            const updated = currentStudents.filter((_, i) => i !== originalIndex);
-                            const updatedSession = { ...session, students: updated };
-                            setSession(updatedSession);
-                            const currentFileName = getFileNameFromTerm(session.term);
-                            if (currentFileName) {
-                              await saveSessionToFile(updatedSession, currentFileName);
-                            }
-                          }}
+                          onClick={() => setStudentToDeleteIndex(originalIndex)}
                           className="p-1 border rounded hover:bg-red-50 text-red-600"
+                          title="Delete Student Result"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -548,6 +566,43 @@ export default function HomeSPA() {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {studentToDeleteIndex !== null && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl border border-gray-200">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <div className="rounded-full bg-red-100 p-2">
+                <AlertTriangle className="h-6 w-6" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Schüler löschen</h3>
+            </div>
+
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">
+              Bist du sicher, dass du das Ergebnis von{" "}
+              <span className="font-semibold text-gray-900">
+                {studentPendingDelete ? `${studentPendingDelete.firstName} ${studentPendingDelete.familyName}` : "diesen Schüler"}
+              </span>{" "}
+              löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setStudentToDeleteIndex(null)}
+                className="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={confirmDeleteStudent}
+                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700"
+              >
+                Endgültig löschen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Student Entry Modal */}
       {currentStudent && (
