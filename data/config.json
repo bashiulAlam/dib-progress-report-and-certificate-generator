@@ -1,0 +1,323 @@
+{
+  "academyName": "Darul Ihsan Berlin Academy",
+  "city": "Berlin",
+  "signatureImage": "/assets/signature.png",
+  "levels": [
+    {
+      "id": "madani_nesab",
+      "name": "Madani Nesab",
+      "subjects": [
+        {
+          "id": "arabische_literatur",
+          "name": "Arabische Literatur",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "mizhan",
+          "name": "Mizhan",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "masader",
+          "name": "Masader",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "heoar",
+          "name": "Heoar",
+          "maxPoints": 50,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "arabische_schrift",
+          "name": "Arabische Schrift",
+          "maxPoints": 50,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "nahu",
+          "name": "Nahu",
+          "maxPoints": 100,
+          "isOptional": true,
+          "includeInTotal": true
+        },
+        {
+          "id": "seerah",
+          "name": "Seerah",
+          "maxPoints": 100,
+          "isOptional": true,
+          "includeInTotal": false
+        },
+        {
+          "id": "class_performance",
+          "name": "Class Performance",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true,
+          "subCategories": [
+            {
+              "id": "pünktlichkeit",
+              "name": "Pünktlichkeit",
+              "maxPoints": 25
+            },
+            {
+              "id": "hausaufgaben",
+              "name": "Hausaufgaben",
+              "maxPoints": 25
+            },
+            {
+              "id": "mitarbeit",
+              "name": "Mitarbeit",
+              "maxPoints": 25
+            },
+            {
+              "id": "adhab",
+              "name": "Adhab",
+              "maxPoints": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lvl_1788864109056",
+      "name": "Hifz",
+      "subjects": [
+        {
+          "id": "sub_1788864142240",
+          "name": "Auswendiglernen",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "sub_1788864161088",
+          "name": "Najera",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "sub_1788864174755",
+          "name": "Melodie",
+          "maxPoints": 50,
+          "isOptional": false,
+          "includeInTotal": true
+        },
+        {
+          "id": "sub_cp_1788864109056",
+          "name": "Class Performance",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true,
+          "subCategories": [
+            {
+              "id": "subcat_punkt_1788864109056",
+              "name": "Pünktlichkeit",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_hw_1788864109056",
+              "name": "Wiederholung",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_mitarb_1788864109056",
+              "name": "Neu Hifz",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_adhab_1788864109056",
+              "name": "Adhab",
+              "maxPoints": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "noorani",
+      "name": "Noorani",
+      "subLevels": [
+        {
+          "id": "nl_1",
+          "name": "Level 1"
+        },
+        {
+          "id": "nl_2",
+          "name": "Level 2"
+        },
+        {
+          "id": "nl_3",
+          "name": "Level 3"
+        },
+        {
+          "id": "nl_4",
+          "name": "Level 4"
+        },
+        {
+          "id": "nl_5",
+          "name": "Level 5"
+        },
+        {
+          "id": "nl_6",
+          "name": "Level 6"
+        },
+        {
+          "id": "nl_7",
+          "name": "Level 7"
+        },
+        {
+          "id": "nl_8",
+          "name": "Level 8"
+        },
+        {
+          "id": "nl_9",
+          "name": "Level 9"
+        },
+        {
+          "id": "nl_10",
+          "name": "Level 10"
+        }
+      ],
+      "subjects": [
+        {
+          "id": "sub_ai",
+          "name": "Allgemein Islam",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true,
+          "subCategories": [
+            {
+              "id": "subcat_ai_f1",
+              "name": "Frage 1",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_ai_f2",
+              "name": "Frage 2",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_ai_f3",
+              "name": "Frage 3",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_ai_f4",
+              "name": "Frage 4",
+              "maxPoints": 25
+            }
+          ]
+        },
+        {
+          "id": "sub_qn",
+          "name": "Qaida Nooraniyah",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true,
+          "subCategories": [
+            {
+              "id": "subcat_qn_f1",
+              "name": "Frage 1",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_qn_f2",
+              "name": "Frage 2",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_qn_f3",
+              "name": "Frage 3",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_qn_f4",
+              "name": "Frage 4",
+              "maxPoints": 25
+            }
+          ]
+        },
+        {
+          "id": "sub_cp",
+          "name": "Class Performance",
+          "maxPoints": 100,
+          "isOptional": false,
+          "includeInTotal": true,
+          "subCategories": [
+            {
+              "id": "subcat_punkt",
+              "name": "Pünktlichkeit",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_hw",
+              "name": "Hausaufgaben",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_mitarb",
+              "name": "Mitarbeit",
+              "maxPoints": 25
+            },
+            {
+              "id": "subcat_adhab",
+              "name": "Adhab",
+              "maxPoints": 25
+            }
+          ]
+        },
+        {
+          "id": "sub_1788982008540",
+          "name": "Bangla",
+          "maxPoints": 100,
+          "isOptional": true,
+          "includeInTotal": false
+        },
+        {
+          "id": "sub_1789033549108",
+          "name": "Seerah",
+          "maxPoints": 100,
+          "isOptional": true,
+          "includeInTotal": false
+        }
+      ]
+    }
+  ],
+  "coCurricular": {
+    "id": "co_curricular_main",
+    "name": "Co-Curricular Activities",
+    "includeInTotal": true,
+    "activities": [
+      {
+        "id": "sports_day",
+        "name": "Sports Day",
+        "maxPoints": 25
+      },
+      {
+        "id": "garden_day",
+        "name": "Garden Day",
+        "maxPoints": 25
+      },
+      {
+        "id": "science_club",
+        "name": "Science Club Event",
+        "maxPoints": 25
+      },
+      {
+        "id": "islamische_bildung",
+        "name": "Islamische Bildung Project",
+        "maxPoints": 25
+      }
+    ]
+  }
+}

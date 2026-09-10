@@ -1,0 +1,25 @@
+{
+  "term": "Semester 1 - 2026",
+  "date": "2026-07-04",
+  "students": [
+    {
+      "studentId": "std_1788861838538",
+      "firstName": "Jiyad",
+      "familyName": "Rahman",
+      "level": "madani_nesab",
+      "scores": {
+        "arabische_literatur": 25,
+        "mizhan": 25,
+        "masader": 25,
+        "heoar": 25,
+        "arabische_schrift": 25,
+        "pünktlichkeit": 25,
+        "hausaufgaben": 25,
+        "mitarbeit": 25,
+        "adhab": 25
+      },
+      "totalScore": 225,
+      "maxPossibleScore": 500
+    }
+  ]
+}
