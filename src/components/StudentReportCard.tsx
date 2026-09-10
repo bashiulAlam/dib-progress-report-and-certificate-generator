@@ -4,6 +4,7 @@ import React from "react";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
 import { calculateStudentTotal } from "@/lib/utils";
 import { Printer, X } from "lucide-react";
+import { CornerOrnament } from "@/components/CornerOrnament";
 
 interface Props {
     student: StudentScore;
@@ -71,34 +72,17 @@ export default function StudentReportCard({ student, session, config, onClose }:
             {/* A4 Report Sheet Container */}
             <div className="print:m-0 print:p-8 print:shadow-none bg-white w-[210mm] min-h-[297mm] p-10 rounded-sm shadow-xl relative text-gray-900 border-4 border-[#005C3C] flex flex-col font-serif box-border justify-between select-none overflow-hidden">
 
-                {/* --- Large Corner Ornaments (24x24 / 96px) --- */}
                 {/* Top-Left */}
-                <svg className="absolute -top-1 -left-1 w-24 h-24 text-[#005C3C] pointer-events-none z-0" viewBox="0 0 100 100">
-                    <path d="M0,0 L55,0 L55,10 L10,10 L10,55 L0,55 Z" fill="currentColor" />
-                    <path d="M15,15 L42,15 L42,20 L20,20 L20,42 L15,42 Z" fill="currentColor" opacity="0.6" />
-                    <polygon points="25,25 35,25 30,35" fill="#E1A929" />
-                </svg>
+                <CornerOrnament className="absolute -top-1 -left-1 w-24 h-24 pointer-events-none z-0" />
 
                 {/* Top-Right */}
-                <svg className="absolute -top-1 -right-1 w-24 h-24 text-[#005C3C] pointer-events-none rotate-90 z-0" viewBox="0 0 100 100">
-                    <path d="M0,0 L55,0 L55,10 L10,10 L10,55 L0,55 Z" fill="currentColor" />
-                    <path d="M15,15 L42,15 L42,20 L20,20 L20,42 L15,42 Z" fill="currentColor" opacity="0.6" />
-                    <polygon points="25,25 35,25 30,35" fill="#E1A929" />
-                </svg>
+                <CornerOrnament className="absolute -top-1 -right-1 w-24 h-24 pointer-events-none rotate-90 z-0" />
 
                 {/* Bottom-Left */}
-                <svg className="absolute -bottom-1 -left-1 w-24 h-24 text-[#005C3C] pointer-events-none -rotate-90 z-0" viewBox="0 0 100 100">
-                    <path d="M0,0 L55,0 L55,10 L10,10 L10,55 L0,55 Z" fill="currentColor" />
-                    <path d="M15,15 L42,15 L42,20 L20,20 L20,42 L15,42 Z" fill="currentColor" opacity="0.6" />
-                    <polygon points="25,25 35,25 30,35" fill="#E1A929" />
-                </svg>
+                <CornerOrnament className="absolute -bottom-1 -left-1 w-24 h-24 pointer-events-none -rotate-90 z-0" />
 
                 {/* Bottom-Right */}
-                <svg className="absolute -bottom-1 -right-1 w-24 h-24 text-[#005C3C] pointer-events-none rotate-180 z-0" viewBox="0 0 100 100">
-                    <path d="M0,0 L55,0 L55,10 L10,10 L10,55 L0,55 Z" fill="currentColor" />
-                    <path d="M15,15 L42,15 L42,20 L20,20 L20,42 L15,42 Z" fill="currentColor" opacity="0.6" />
-                    <polygon points="25,25 35,25 30,35" fill="#E1A929" />
-                </svg>
+                <CornerOrnament className="absolute -bottom-1 -right-1 w-24 h-24 pointer-events-none rotate-180 z-0" />
 
                 {/* Main Content Area */}
                 <div className="relative z-10 px-2 flex-1 flex flex-col justify-between pb-2">
@@ -112,7 +96,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                     className="h-12 w-auto object-contain"
                                 />
                             </div>
-                            <h1 className="text-lg font-bold tracking-wider text-[#005C3C] uppercase font-sans">
+                            <h1 className="text-xl font-bold tracking-wider text-[#005C3C] font-sans">
                                 {config.academyName}
                             </h1>
                             <h2 className="text-lg font-semibold text-[#E1A929] italic">
@@ -291,7 +275,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                     className="max-h-12 object-contain"
                                 />
                             </div>
-                            <div className="w-full border-b border-dashed border-gray-400 mb-2"></div>
+                            <div className="w-48 mx-auto border-b border-dashed border-gray-400 mb-2"></div>
                             <span className="font-bold text-gray-900 text-xs">Unterschrift des Lehrers</span>
                         </div>
 
@@ -301,10 +285,10 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                 <img
                                     src="/assets/signature-schulleiter.png"
                                     alt="Headmaster Signature"
-                                    className="max-h-12 object-contain"
+                                    className="max-h-18 object-contain"
                                 />
                             </div>
-                            <div className="w-full border-b border-dashed border-gray-400 mb-2"></div>
+                            <div className="w-48 mx-auto border-b border-dashed border-gray-400 mb-2"></div>
                             <span className="font-bold text-gray-900 text-xs">Unterschrift des Schulleiters</span>
                         </div>
                     </div>
