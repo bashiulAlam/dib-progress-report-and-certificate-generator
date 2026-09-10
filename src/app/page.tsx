@@ -362,11 +362,18 @@ export default function HomeSPA() {
     <div className="min-h-screen bg-gray-50 p-8">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-white p-6 rounded-lg border shadow-xs">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{config.academyName}</h1>
-          <p className="text-sm text-gray-500">
-            Current File: <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
-          </p>
+        <div className="flex items-center gap-4">
+          <img
+            src="/assets/dib-logo.png"
+            alt="Academy Logo"
+            className="h-12 w-auto object-contain"
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{config.academyName}</h1>
+            <p className="text-sm text-gray-500">
+              Current File: <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
+            </p>
+          </div>
         </div>
 
         <div className="flex gap-3">

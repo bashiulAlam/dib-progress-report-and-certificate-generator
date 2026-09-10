@@ -187,7 +187,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                                             </div>
                                                             {/* Render Custom Syllabus under subject name */}
                                                             {sub.hasCustomSyllabus && student.syllabi?.[sub.id] && (
-                                                                <div className="text-[10px] text-emerald-800 italic font-serif leading-tight mt-0.5">
+                                                                <div className="text-[11px] text-emerald-800 italic font-serif leading-tight mt-0.5">
                                                                     Lehrplan: {student.syllabi[sub.id]}
                                                                 </div>
                                                             )}
@@ -221,7 +221,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                                                 {!isGrade && opt.maxPoints ? ` (${opt.maxPoints}P)` : ""}
                                                             </div>
                                                             {opt.hasCustomSyllabus && student.syllabi?.[opt.id] && (
-                                                                <div className="text-[10px] text-emerald-800 italic font-serif leading-tight mt-0.5">
+                                                                <div className="text-[11px] text-emerald-800 italic font-serif leading-tight mt-0.5">
                                                                     Lehrplan: {student.syllabi[opt.id]}
                                                                 </div>
                                                             )}
