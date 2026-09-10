@@ -1,8 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Progress Report and Certificate Generator
+
+A comprehensive Next.js web application for generating progress reports and certificates for students. Features include admin configuration, level/sub-level management, subject tracking, co-curricular activities, and PDF certificate generation.
+
+## Features
+
+- 📊 **Progress Reports** - Generate detailed student progress reports
+- 🎓 **Certificate Generation** - Create customizable certificates in PDF format
+- 👤 **Admin Panel** - Manage levels, sub-levels, subjects, and academy settings
+- 🏆 **Co-Curricular Activities** - Track and manage student activities
+- 📁 **Drag & Drop** - Intuitive file management interface
+- 🎨 **Responsive Design** - Works seamlessly on desktop and tablet devices
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+### Development
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +47,62 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The app auto-updates as you edit files in `src/app/`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx           # Main application
+│   ├── add/               # Add/upload page
+│   └── admin/             # Admin configuration panel
+├── components/            # Reusable React components
+├── lib/                   # Utility functions
+└── data/
+    └── drafts/            # Temporary draft files (gitignored)
+```
+
+## Usage
+
+### For Users
+1. Navigate to the main page to upload student data
+2. Configure progress reports and certificates
+3. Generate and download PDF files
+
+### For Admins
+1. Go to `/admin` to configure:
+   - Academy/organization name
+   - Education levels and sub-levels
+   - Subjects
+   - Co-curricular activities
+2. Save changes to persist configuration
+
+## Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org) - React framework with App Router
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
+- [Tailwind CSS](https://tailwindcss.com)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The easiest way to deploy is using [Vercel](https://vercel.com):
 
-## Deploy on Vercel
+1. Push your code to GitHub
+2. Import the repository on Vercel
+3. Deploy with one click
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+Contributions are welcome! Feel free to submit issues and pull requests.
