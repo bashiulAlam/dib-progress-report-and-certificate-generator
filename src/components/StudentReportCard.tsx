@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
 import { calculateStudentTotal } from "@/lib/utils";
 import { Printer, X } from "lucide-react";
@@ -219,6 +220,12 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
 );
 
 export default function StudentReportCard({ student, session, config, onClose, bulkPrint = false }: Props) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const levelConfig = config.levels.find((l) => l.id === student.level);
     const subLevelConfig = levelConfig?.subLevels?.find((sl) => sl.id === student.subLevel);
 
@@ -228,13 +235,18 @@ export default function StudentReportCard({ student, session, config, onClose, b
     student.maxPossibleScore = maxPossibleScore;
 
     const handlePrint = () => {
+        const originalTitle = document.title;
+        const cleanName = `${student.firstName}_${student.familyName}`.replace(/\s+/g, "_");
+        document.title = `${cleanName}_Report_Card`;
+
         window.print();
+
+        document.title = originalTitle;
     };
 
     const coCurricularActivities = config.coCurricular?.activities ?? [];
     const optionalSubjects = levelConfig?.optionalSubjects ?? [];
 
-    // Active optional subjects that have a recorded score
     const activeOptionalSubjects = optionalSubjects.filter(
         (opt) => student.scores[opt.id] !== undefined && student.scores[opt.id] !== null
     );
@@ -251,59 +263,77 @@ export default function StudentReportCard({ student, session, config, onClose, b
         activeOptionalSubjects,
     };
 
-    // For single print mode: Show modal
+    // Single Print Mode: Render UI in normal screen tree, and Portal printable sheet directly to body
     if (!bulkPrint) {
         return (
-            <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-start z-50 overflow-y-auto p-4 sm:p-6 report-modal-overlay">
-                <div className="print:hidden bg-white rounded-lg shadow-md p-4 mb-4 max-w-4xl w-full flex justify-between items-center">
-                    <div>
-                        <h2 className="font-bold text-gray-800">Print Preview</h2>
-                        <p className="text-xs text-gray-500">
-                            Click "Print / Save PDF" to generate the A4 report card.
-                        </p>
+            <>
+                {/* --- Screen-only Preview Modal --- */}
+                <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-start z-50 overflow-y-auto p-4 sm:p-6 print:hidden">
+                    <div className="bg-white rounded-lg shadow-md p-4 mb-4 max-w-4xl w-full flex justify-between items-center">
+                        <div>
+                            <h2 className="font-bold text-gray-800">Print Preview</h2>
+                            <p className="text-xs text-gray-500">
+                                Click "Print / Save PDF" to generate the A4 report card.
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handlePrint}
+                                className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-4 py-2 rounded text-sm transition-colors"
+                            >
+                                <Printer size={16} /> Print / Save PDF
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="flex items-center gap-1 border border-gray-300 hover:bg-gray-100 px-3 py-2 rounded text-sm text-gray-700"
+                            >
+                                <X size={16} /> Close
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={handlePrint}
-                            className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-4 py-2 rounded text-sm transition-colors"
-                        >
-                            <Printer size={16} /> Print / Save PDF
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="flex items-center gap-1 border border-gray-300 hover:bg-gray-100 px-3 py-2 rounded text-sm text-gray-700"
-                        >
-                            <X size={16} /> Close
-                        </button>
+
+                    {/* On-screen Preview Card */}
+                    <div className="bg-white w-[210mm] min-h-[297mm] p-10 rounded-sm shadow-xl relative text-gray-900 border-4 border-[#005C3C] flex flex-col font-serif box-border justify-between select-none overflow-hidden">
+                        <CornerOrnament className="absolute -top-1 -left-1 w-24 h-24 pointer-events-none z-0" />
+                        <CornerOrnament className="absolute -top-1 -right-1 w-24 h-24 pointer-events-none rotate-90 z-0" />
+                        <CornerOrnament className="absolute -bottom-1 -left-1 w-24 h-24 pointer-events-none -rotate-90 z-0" />
+                        <CornerOrnament className="absolute -bottom-1 -right-1 w-24 h-24 pointer-events-none rotate-180 z-0" />
+
+                        <div className="relative z-10 px-2 flex-1 flex flex-col justify-between pb-2">
+                            <ReportCardContent {...contentProps} />
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-white w-[210mm] min-h-[297mm] p-10 rounded-sm shadow-xl relative text-gray-900 border-4 border-[#005C3C] flex flex-col font-serif box-border justify-between select-none overflow-hidden">
-                    {/* Decorative Corners */}
-                    <CornerOrnament className="absolute -top-1 -left-1 w-24 h-24 pointer-events-none z-0" />
-                    <CornerOrnament className="absolute -top-1 -right-1 w-24 h-24 pointer-events-none rotate-90 z-0" />
-                    <CornerOrnament className="absolute -bottom-1 -left-1 w-24 h-24 pointer-events-none -rotate-90 z-0" />
-                    <CornerOrnament className="absolute -bottom-1 -right-1 w-24 h-24 pointer-events-none rotate-180 z-0" />
+                {/* --- Portal Printable Target to document.body (Print Only) --- */}
+                {mounted &&
+                    createPortal(
+                        <div className="hidden print:block print:absolute print:left-0 print:top-0 print:w-full print:bg-white print:z-[99999]">
+                            <div className="bg-white w-[210mm] min-h-[297mm] p-10 relative text-gray-900 border-4 border-[#005C3C] flex flex-col font-serif box-border justify-between select-none overflow-hidden mx-auto">
+                                <CornerOrnament className="absolute -top-1 -left-1 w-24 h-24 pointer-events-none z-0" />
+                                <CornerOrnament className="absolute -top-1 -right-1 w-24 h-24 pointer-events-none rotate-90 z-0" />
+                                <CornerOrnament className="absolute -bottom-1 -left-1 w-24 h-24 pointer-events-none -rotate-90 z-0" />
+                                <CornerOrnament className="absolute -bottom-1 -right-1 w-24 h-24 pointer-events-none rotate-180 z-0" />
 
-                    {/* Content */}
-                    <div className="relative z-10 px-2 flex-1 flex flex-col justify-between pb-2">
-                        <ReportCardContent {...contentProps} />
-                    </div>
-                </div>
-            </div>
+                                <div className="relative z-10 px-2 flex-1 flex flex-col justify-between pb-2">
+                                    <ReportCardContent {...contentProps} />
+                                </div>
+                            </div>
+                        </div>,
+                        document.body
+                    )}
+            </>
         );
     }
 
-    // For bulk print mode: Only render content (will be shown via print:block in BulkPrintModal)
+    // Bulk Print Mode: Direct print sheet (handled by BulkPrintModal portal)
     return (
         <div className="bg-white w-[210mm] min-h-[297mm] p-10 relative text-gray-900 border-4 border-[#005C3C] flex flex-col font-serif box-border justify-between select-none overflow-hidden">
-            {/* Decorative Corners */}
             <CornerOrnament className="absolute -top-1 -left-1 w-24 h-24 pointer-events-none z-0" />
             <CornerOrnament className="absolute -top-1 -right-1 w-24 h-24 pointer-events-none rotate-90 z-0" />
             <CornerOrnament className="absolute -bottom-1 -left-1 w-24 h-24 pointer-events-none -rotate-90 z-0" />
             <CornerOrnament className="absolute -bottom-1 -right-1 w-24 h-24 pointer-events-none rotate-180 z-0" />
 
-            {/* Content */}
             <div className="relative z-10 px-2 flex-1 flex flex-col justify-between pb-2">
                 <ReportCardContent {...contentProps} />
             </div>

@@ -91,10 +91,10 @@ export default function BulkPrintModal({
           setStatusMessage("Opening print window...");
           window.print();
 
-          // Restore original title and reset state
+          // Restore original title and reset processing state.
+          // Do not auto-dismiss the modal here: it should remain open until the user explicitly closes it.
           document.title = originalTitle;
           setIsProcessing(false);
-          onClose();
         }, 400);
       });
     });

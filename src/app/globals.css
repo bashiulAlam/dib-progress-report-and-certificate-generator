@@ -61,6 +61,31 @@
     width: 100%;
   }
 
+  .report-modal-overlay,
+  .report-modal-overlay * {
+    visibility: visible !important;
+  }
+
+  .report-modal-overlay > :not(.report-card-printable) {
+    display: none !important;
+  }
+
+  .report-card-printable,
+  .report-card-printable * {
+    visibility: visible !important;
+  }
+
+  .report-card-printable {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    margin: 0 auto !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+
   /* Reset body wrapper */
   html,
   body {
