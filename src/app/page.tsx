@@ -6,6 +6,9 @@ import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileTe
 import StudentReportCard from "@/components/StudentReportCard";
 import { calculateStudentTotal } from "@/lib/utils";
 
+import { Printer } from "lucide-react";
+import BulkPrintModal from "@/components/BulkPrintModal";
+
 const DRAFT_STORAGE_KEY = "progress_report_unsaved_session";
 const ACTIVE_FILE_KEY = "progress_report_active_file";
 
@@ -14,6 +17,7 @@ export default function HomeSPA() {
   const [savedFiles, setSavedFiles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPrintStudent, setSelectedPrintStudent] = useState<StudentScore | null>(null);
+  const [showBulkPrintModal, setShowBulkPrintModal] = useState(false);
 
   const [activeFileName, setActiveFileName] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -49,7 +53,7 @@ export default function HomeSPA() {
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [activeEditIndex, setActiveEditIndex] = useState<number | null>(null);
   const [isNewStudent, setIsNewStudent] = useState(false);
-  
+
   // State for delete confirmation modal
   const [studentToDeleteIndex, setStudentToDeleteIndex] = useState<number | null>(null);
 
@@ -171,9 +175,9 @@ export default function HomeSPA() {
     const currentStudents = Array.isArray(session?.students) ? session.students : [];
     const updated = currentStudents.filter((_, i) => i !== studentToDeleteIndex);
     const updatedSession = { ...session, students: updated };
-    
+
     setSession(updatedSession);
-    
+
     const currentFileName = getFileNameFromTerm(session.term);
     if (currentFileName) {
       await saveSessionToFile(updatedSession, currentFileName);
@@ -384,7 +388,7 @@ export default function HomeSPA() {
       : null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-8 print:hidden">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-white p-6 rounded-lg border shadow-xs">
         <div className="flex items-center gap-4">
@@ -484,6 +488,13 @@ export default function HomeSPA() {
               <UserPlus size={16} /> Add Student Result
             </button>
           </div>
+
+          <button
+            onClick={() => setShowBulkPrintModal(true)}
+            className="flex items-center gap-1.5 border border-gray-300 bg-white text-gray-700 px-3.5 py-2 rounded text-sm hover:bg-gray-50 font-medium shadow-xs"
+          >
+            <Printer size={16} className="text-blue-600" /> Bulk Print Reports
+          </button>
         </div>
 
         {/* Compact Table View */}
@@ -915,6 +926,16 @@ export default function HomeSPA() {
           onClose={() => setSelectedPrintStudent(null)}
         />
       )}
+
+      {/* Bulk Print Modal */}
+      <BulkPrintModal
+        isOpen={showBulkPrintModal}
+        onClose={() => setShowBulkPrintModal(false)}
+        session={session}
+        config={config}
+        defaultLevelId={selectedLevelId}
+        defaultSubLevelId={selectedSubLevelId}
+      />
     </div>
   );
 }

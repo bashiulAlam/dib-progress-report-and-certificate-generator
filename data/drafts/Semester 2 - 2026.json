@@ -21,9 +21,10 @@
         "sports_day": 25,
         "garden_day": 25,
         "science_club": 25,
-        "islamische_bildung": 25
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
       },
-      "totalScore": 506,
+      "totalScore": 531,
       "maxPossibleScore": 600
     },
     {
@@ -50,7 +51,8 @@
         "science_club": 25,
         "islamische_bildung": 25,
         "sub_1788982008540": "Sehr Gut",
-        "sub_1789033549108": 94
+        "sub_1789033549108": 94,
+        "co_1789064756155": 25
       },
       "totalScore": 373,
       "maxPossibleScore": 400
@@ -71,10 +73,14 @@
         "sports_day": 25,
         "garden_day": 25,
         "science_club": 25,
-        "islamische_bildung": 25
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
       },
       "totalScore": 374,
-      "maxPossibleScore": 450
+      "maxPossibleScore": 450,
+      "syllabi": {
+        "sub_1788864142240": "Sura Ahkaf, Sura Waqi'ah und Juz 29 bis Juz 30"
+      }
     },
     {
       "studentId": "std_1789036500585",
@@ -97,8 +103,8 @@
         "science_club": 25,
         "islamische_bildung": 25
       },
-      "totalScore": 431,
-      "maxPossibleScore": 500
+      "totalScore": 406,
+      "maxPossibleScore": 600
     },
     {
       "studentId": "std_1789036758633",
@@ -126,7 +132,7 @@
         "sub_1788982008540": "Sehr Gut",
         "sub_1789033549108": 89
       },
-      "totalScore": 376,
+      "totalScore": 351,
       "maxPossibleScore": 400
     },
     {
@@ -171,10 +177,14 @@
         "sports_day": 25,
         "garden_day": 25,
         "science_club": 25,
-        "islamische_bildung": 25
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
       },
       "totalScore": 395,
-      "maxPossibleScore": 450
+      "maxPossibleScore": 450,
+      "syllabi": {
+        "sub_1788864142240": "Juz 29 bis Juz 30"
+      }
     },
     {
       "studentId": "std_1789064495689",
@@ -265,6 +275,85 @@
       },
       "syllabi": {},
       "totalScore": 371.5,
+      "maxPossibleScore": 400
+    },
+    {
+      "studentId": "std_1789413543033",
+      "firstName": "Mohammad Ishak",
+      "familyName": "Sekh",
+      "level": "lvl_1788864109056",
+      "scores": {
+        "sub_1788864142240": 64,
+        "sub_1788864161088": 69,
+        "sub_1788864174755": 35,
+        "subcat_punkt_1788864109056": 20,
+        "subcat_hw_1788864109056": 22,
+        "subcat_mitarb_1788864109056": 22,
+        "subcat_adhab_1788864109056": 25,
+        "sports_day": 25,
+        "science_club": 0,
+        "islamische_bildung": 0,
+        "co_1789064756155": 0
+      },
+      "syllabi": {
+        "sub_1788864142240": "Juz 30"
+      },
+      "totalScore": 282,
+      "maxPossibleScore": 450
+    },
+    {
+      "studentId": "std_1789414168885",
+      "firstName": "Jayma",
+      "familyName": "Rahman",
+      "level": "madani_nesab",
+      "scores": {
+        "arabische_literatur": 80,
+        "mizhan": 76,
+        "masader": 90,
+        "heoar": 42,
+        "arabische_schrift": 34,
+        "nahu": 70,
+        "seerah": 90,
+        "pünktlichkeit": 23,
+        "hausaufgaben": 24,
+        "mitarbeit": 25,
+        "adhab": 25,
+        "sports_day": 25,
+        "science_club": 25,
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
+      },
+      "syllabi": {},
+      "totalScore": 589,
+      "maxPossibleScore": 700
+    },
+    {
+      "studentId": "std_1789414856845",
+      "firstName": "Mohammad Rushaid",
+      "familyName": "Tanjil",
+      "level": "noorani",
+      "subLevel": "nl_7",
+      "scores": {
+        "subcat_ai_f1": 22,
+        "subcat_ai_f2": 23,
+        "subcat_ai_f3": 24,
+        "subcat_ai_f4": 25,
+        "subcat_qn_f1": 22,
+        "subcat_qn_f2": 25,
+        "subcat_qn_f3": 25,
+        "subcat_qn_f4": 20,
+        "subcat_punkt": 20,
+        "subcat_hw": 23,
+        "subcat_mitarb": 25,
+        "subcat_adhab": 25,
+        "sub_1789033549108": 86,
+        "sports_day": 25,
+        "science_club": 25,
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
+      },
+      "syllabi": {},
+      "totalScore": 379,
       "maxPossibleScore": 400
     }
   ]
