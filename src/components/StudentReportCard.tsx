@@ -23,37 +23,58 @@ const translateSubject = (name: string): string => {
     return translations[name] || name;
 };
 
-const ReportCardContent = ({ student, session, config, levelConfig, subLevelConfig, totalScore, maxPossibleScore, coCurricularActivities, activeOptionalSubjects }: any) => (
+const ReportCardContent = ({ student, session, config, levelConfig, subLevelConfig, totalScore, maxPossibleScore, coCurricularActivities, activeOptionalSubjects, logoHeight, academyFontSize, studentNameFontSize }: any) => (
     <>
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center select-none z-0">
+            <img
+                src="/assets/dib-logo.png"
+                alt=""
+                className="w-[360px] h-auto object-contain"
+                style={{
+                    opacity: 0.04,
+                    filter: "grayscale(1) brightness(0.5) contrast(0.5)",
+                    transform: "scale(1.1)",
+                    mixBlendMode: "multiply",
+                }}
+            />
+        </div>
+
         {/* Header */}
-        <div className="text-center space-y-0.5 mt-1">
-            <div className="flex justify-center mb-0.5">
+        <div className="text-center mt-1 relative z-10">
+            <div className="flex justify-center mb-1">
                 <img
                     src="/assets/dib-logo.png"
                     alt="Academy Logo"
-                    className="h-12 w-auto object-contain"
+                    className="w-auto object-contain"
+                    style={{ height: `${logoHeight}px`, maxWidth: "100%" }}
                 />
             </div>
-            <h1 className="text-xl font-bold tracking-wider text-[#005C3C] font-sans">
+            <h1
+                className="font-bold tracking-wider text-[#005C3C] font-sans"
+                style={{ fontSize: academyFontSize, lineHeight: 1.1 }}
+            >
                 {config.academyName}
             </h1>
-            <h2 className="text-lg font-semibold text-[#E1A929] italic">
+            <h2 className="text-lg font-semibold text-[#E1A929] italic leading-tight">
                 Fortschrittsbericht
             </h2>
-            <p className="text-sm font-sans font-semibold text-gray-600">
+            <p className="text-sm font-sans font-semibold text-gray-600 leading-tight">
                 {session.term}
             </p>
         </div>
 
         {/* Student Info */}
-        <div className="text-center my-5 space-y-1.5">
-            <p className="text-sm italic text-gray-600">
+        <div className="text-center my-3 space-y-1">
+            <p className="text-sm italic text-gray-600 leading-snug">
                 Dieser Fortschrittsbericht wird feierlich überreicht an
             </p>
-            <h3 className="text-xl font-bold text-gray-900 italic underline decoration-[#E1A929] decoration-2 underline-offset-8">
+            <h3
+                className="font-bold text-gray-900 italic underline decoration-[#E1A929] decoration-2 underline-offset-8"
+                style={{ fontSize: studentNameFontSize, lineHeight: 1.2 }}
+            >
                 {student.firstName} {student.familyName}
             </h3>
-            <p className="text-sm font-sans text-gray-800 font-medium pt-1">
+            <p className="text-sm font-sans text-gray-800 font-medium pt-1 leading-snug">
                 Abteilung: <span className="font-bold">{levelConfig?.name || student.level}</span>
                 {subLevelConfig && <span> ({subLevelConfig.name})</span>}
             </p>
@@ -62,7 +83,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                     {levelConfig.subjects.map((sub: any) => {
                         if (sub.hasCustomSyllabus && student.syllabi?.[sub.id]) {
                             return (
-                                <p key={sub.id} className="text-sm font-sans text-gray-800 italic font-bold">
+                                <p key={sub.id} className="text-sm font-sans text-gray-800 italic font-bold leading-snug">
                                     Lehrplan: {student.syllabi[sub.id]}
                                 </p>
                             );
@@ -70,7 +91,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                     })}
                 </div>
             )}
-            <p className="text-sm text-gray-500 italic whitespace-nowrap">
+            <p className="text-sm text-gray-500 italic whitespace-nowrap leading-snug">
                 In Anerkennung deiner kontinuierlichen Bemühungen und deines Lernfortschritts.
             </p>
         </div>
@@ -251,6 +272,17 @@ export default function StudentReportCard({ student, session, config, onClose, b
         (opt) => student.scores[opt.id] !== undefined && student.scores[opt.id] !== null
     );
 
+    const contentDensity =
+        (levelConfig?.subjects?.length ?? 0) +
+        (activeOptionalSubjects?.length ?? 0) +
+        (coCurricularActivities?.length ?? 0);
+
+    const densityPenalty = Math.max(0, contentDensity - 4) * 1.2;
+
+    const logoHeight = Math.max(56, Math.min(68, 60 - densityPenalty * 1));
+    const academyFontSize = `${Math.max(15, Math.round(18 - densityPenalty * 0.45))}px`;
+    const studentNameFontSize = `${Math.max(17, Math.round(21 - densityPenalty * 0.55))}px`;
+
     const contentProps = {
         student,
         session,
@@ -261,6 +293,9 @@ export default function StudentReportCard({ student, session, config, onClose, b
         maxPossibleScore,
         coCurricularActivities,
         activeOptionalSubjects,
+        logoHeight,
+        academyFontSize,
+        studentNameFontSize,
     };
 
     // Single Print Mode: Render UI in normal screen tree, and Portal printable sheet directly to body
