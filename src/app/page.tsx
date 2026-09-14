@@ -743,7 +743,8 @@ export default function HomeSPA() {
                                 {subCat.name} (Max {subCat.maxPoints}) *
                               </label>
                               <input
-                                type="text"
+                                type="number"
+                                step="0.01"
                                 placeholder="Points or n.z."
                                 value={currentStudent.scores[subCat.id] ?? ""}
                                 onChange={(e) => handleScoreChange(subCat.id, e.target.value)}
@@ -758,7 +759,8 @@ export default function HomeSPA() {
                             {sub.name} Score (Max {sub.maxPoints}) {!sub.isOptional && "*"}
                           </label>
                           <input
-                            type="text"
+                            type="number"
+                            step="0.01"
                             placeholder="Points or n.z."
                             value={currentStudent.scores[sub.id] ?? ""}
                             onChange={(e) => handleScoreChange(sub.id, e.target.value)}
@@ -799,7 +801,8 @@ export default function HomeSPA() {
                             {act.name} (Max {act.maxPoints})
                           </label>
                           <input
-                            type="text"
+                            type="number"
+                            step="0.01"
                             placeholder="Points or n.z."
                             value={currentStudent.scores[act.id] ?? ""}
                             onChange={(e) => handleScoreChange(act.id, e.target.value)}

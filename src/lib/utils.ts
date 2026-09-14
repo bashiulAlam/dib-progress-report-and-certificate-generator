@@ -86,5 +86,8 @@ export function calculateStudentTotal(
     }
   });
 
-  return { totalScore, maxPossibleScore };
+  // Round to 2 decimal places to avoid floating-point precision issues
+  const roundedTotal = Math.round(totalScore * 100) / 100;
+
+  return { totalScore: roundedTotal, maxPossibleScore };
 }

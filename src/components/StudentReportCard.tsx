@@ -226,7 +226,7 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                         <>
                                             <tr className="bg-[#005C3C]/10 text-[#005C3C]">
                                                 <td colSpan={2} className="border border-[#005C3C] px-2.5 py-1 font-sans font-bold tracking-wider text-[10px]">
-                                                    Außerunterrichtliche Aktivitäten (Co-Curricular)
+                                                    Außerunterrichtliche Aktivitäten
                                                 </td>
                                             </tr>
                                             {coCurricularActivities.map((act, aIdx) => (
