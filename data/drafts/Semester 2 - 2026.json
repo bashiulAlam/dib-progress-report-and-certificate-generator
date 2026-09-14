@@ -23,7 +23,7 @@
         "science_club": 25,
         "islamische_bildung": 25
       },
-      "totalScore": 531,
+      "totalScore": 506,
       "maxPossibleScore": 600
     },
     {
@@ -149,7 +149,8 @@
         "sports_day": 25,
         "garden_day": 25,
         "science_club": 25,
-        "islamische_bildung": 25
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
       },
       "totalScore": 570,
       "maxPossibleScore": 700
@@ -234,6 +235,36 @@
       },
       "syllabi": {},
       "totalScore": 399,
+      "maxPossibleScore": 400
+    },
+    {
+      "studentId": "std_1789411793999",
+      "firstName": "Fiza",
+      "familyName": "Islam",
+      "level": "noorani",
+      "subLevel": "nl_6",
+      "scores": {
+        "subcat_ai_f1": 22,
+        "subcat_ai_f2": 23,
+        "subcat_ai_f3": 24,
+        "subcat_ai_f4": 21,
+        "subcat_qn_f1": 23.5,
+        "subcat_qn_f2": 24,
+        "subcat_qn_f3": 18,
+        "subcat_qn_f4": 20,
+        "subcat_punkt": 22,
+        "subcat_hw": 24,
+        "subcat_mitarb": 25,
+        "subcat_adhab": 25,
+        "sub_1788982008540": "Sehr Gut",
+        "sub_1789033549108": 88,
+        "sports_day": 25,
+        "science_club": 25,
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
+      },
+      "syllabi": {},
+      "totalScore": 371.5,
       "maxPossibleScore": 400
     }
   ]

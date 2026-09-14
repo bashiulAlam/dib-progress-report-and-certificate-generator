@@ -247,8 +247,8 @@ export default function StudentReportCard({ student, session, config, onClose }:
                                         <td className="border border-[#005C3C] px-2.5 py-1.5 font-sans">
                                             Gesamtpunkte
                                         </td>
-                                        <td className="border border-[#005C3C] px-2 py-1.5 text-center text-[#005C3C] text-xs">
-                                            {totalScore} / {maxPossibleScore}
+                                        <td className="border border-[#005C3C] px-2 py-1.5 text-center text-[#005C3C] text-sm font-bold">
+                                            {totalScore}
                                         </td>
                                     </tr>
                                 </tbody>
