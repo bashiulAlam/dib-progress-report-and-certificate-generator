@@ -245,10 +245,19 @@ export default function HomeSPA() {
     student.scores = updatedScores;
     const levelConfig = config.levels.find((l) => l.id === student.level);
 
-    const { totalScore, maxPossibleScore } = calculateStudentTotal(student, levelConfig, config);
+    // 1. Destructure the pre-calculated percentages
+    const {
+      totalScore,
+      maxPossibleScore,
+      academicPercent,
+      classPerformancePercent
+    } = calculateStudentTotal(student, levelConfig, config);
 
+    // 2. Assign the computed values to the student object
     student.totalScore = totalScore;
     student.maxPossibleScore = maxPossibleScore;
+    student.academicPercent = academicPercent;
+    student.classPerformancePercent = classPerformancePercent;
 
     updatedStudents[activeEditIndex] = student;
     setSession({ ...session, students: updatedStudents });
@@ -683,9 +692,18 @@ export default function HomeSPA() {
                       ? updatedLevel.subLevels[0].id
                       : undefined;
 
-                    const { totalScore, maxPossibleScore } = calculateStudentTotal(student, updatedLevel, config);
+                    // Recalculate totals and percentages for the newly selected level
+                    const {
+                      totalScore,
+                      maxPossibleScore,
+                      academicPercent,
+                      classPerformancePercent
+                    } = calculateStudentTotal(student, updatedLevel, config);
+
                     student.totalScore = totalScore;
                     student.maxPossibleScore = maxPossibleScore;
+                    student.academicPercent = academicPercent;
+                    student.classPerformancePercent = classPerformancePercent;
 
                     updated[activeEditIndex] = student;
                     setSession({ ...session, students: updated });

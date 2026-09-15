@@ -25,7 +25,9 @@
         "co_1789064756155": 25
       },
       "totalScore": 531,
-      "maxPossibleScore": 600
+      "maxPossibleScore": 600,
+      "academicPercent": 83,
+      "classPerformancePercent": 98
     },
     {
       "studentId": "std_1789035861611",
@@ -42,7 +44,7 @@
         "subcat_qn_f2": 24,
         "subcat_qn_f3": 22,
         "subcat_qn_f4": 20,
-        "subcat_punkt": 21,
+        "subcat_punkt": 22,
         "subcat_hw": 23,
         "subcat_mitarb": 25,
         "subcat_adhab": 25,
@@ -54,8 +56,10 @@
         "sub_1789033549108": 94,
         "co_1789064756155": 25
       },
-      "totalScore": 373,
-      "maxPossibleScore": 400
+      "totalScore": 374,
+      "maxPossibleScore": 400,
+      "academicPercent": 90,
+      "classPerformancePercent": 95
     },
     {
       "studentId": "std_1789036004592",
@@ -63,7 +67,7 @@
       "familyName": "Osmany",
       "level": "lvl_1788864109056",
       "scores": {
-        "sub_1788864142240": 65,
+        "sub_1788864142240": 67,
         "sub_1788864161088": 78,
         "sub_1788864174755": 35,
         "subcat_punkt_1788864109056": 24,
@@ -76,11 +80,13 @@
         "islamische_bildung": 25,
         "co_1789064756155": 25
       },
-      "totalScore": 374,
+      "totalScore": 376,
       "maxPossibleScore": 450,
       "syllabi": {
         "sub_1788864142240": "Sura Ahkaf, Sura Waqi'ah und Juz 29 bis Juz 30"
-      }
+      },
+      "academicPercent": 72,
+      "classPerformancePercent": 96
     },
     {
       "studentId": "std_1789036500585",
@@ -89,7 +95,7 @@
       "level": "madani_nesab",
       "scores": {
         "arabische_literatur": 45,
-        "mizhan": 57,
+        "mizhan": 59,
         "masader": 76,
         "heoar": 34,
         "arabische_schrift": 22,
@@ -103,8 +109,10 @@
         "science_club": 25,
         "islamische_bildung": 25
       },
-      "totalScore": 406,
-      "maxPossibleScore": 600
+      "totalScore": 408,
+      "maxPossibleScore": 575,
+      "academicPercent": 59,
+      "classPerformancePercent": 97
     },
     {
       "studentId": "std_1789036758633",
@@ -116,7 +124,7 @@
         "subcat_ai_f1": 21,
         "subcat_ai_f2": 23,
         "subcat_ai_f3": 22,
-        "subcat_ai_f4": 20,
+        "subcat_ai_f4": 20.5,
         "subcat_qn_f1": 24,
         "subcat_qn_f2": 21,
         "subcat_qn_f3": 25,
@@ -130,10 +138,13 @@
         "science_club": 25,
         "islamische_bildung": 25,
         "sub_1788982008540": "Sehr Gut",
-        "sub_1789033549108": 89
+        "sub_1789033549108": 89,
+        "co_1789064756155": 25
       },
-      "totalScore": 351,
-      "maxPossibleScore": 400
+      "totalScore": 376.5,
+      "maxPossibleScore": 400,
+      "academicPercent": 91,
+      "classPerformancePercent": 95
     },
     {
       "studentId": "std_1789036878147",
@@ -144,7 +155,7 @@
         "arabische_literatur": 78,
         "mizhan": 80,
         "masader": 92,
-        "heoar": 38,
+        "heoar": 39,
         "arabische_schrift": 43,
         "nahu": 40,
         "seerah": 87,
@@ -158,8 +169,10 @@
         "islamische_bildung": 25,
         "co_1789064756155": 25
       },
-      "totalScore": 570,
-      "maxPossibleScore": 700
+      "totalScore": 571,
+      "maxPossibleScore": 700,
+      "academicPercent": 74,
+      "classPerformancePercent": 99
     },
     {
       "studentId": "std_1789036989877",
@@ -167,7 +180,7 @@
       "familyName": "Hallak",
       "level": "lvl_1788864109056",
       "scores": {
-        "sub_1788864142240": 81,
+        "sub_1788864142240": 82,
         "sub_1788864161088": 78,
         "sub_1788864174755": 41,
         "subcat_punkt_1788864109056": 23,
@@ -180,11 +193,13 @@
         "islamische_bildung": 25,
         "co_1789064756155": 25
       },
-      "totalScore": 395,
+      "totalScore": 396,
       "maxPossibleScore": 450,
       "syllabi": {
         "sub_1788864142240": "Juz 29 bis Juz 30"
-      }
+      },
+      "academicPercent": 80,
+      "classPerformancePercent": 95
     },
     {
       "studentId": "std_1789064495689",
@@ -195,7 +210,7 @@
       "scores": {
         "subcat_ai_f1": 22,
         "subcat_ai_f2": 21,
-        "subcat_ai_f3": 18.5,
+        "subcat_ai_f3": 19,
         "subcat_ai_f4": 20,
         "subcat_qn_f1": 24,
         "subcat_qn_f2": 22,
@@ -214,8 +229,10 @@
         "sports_day": 12.5
       },
       "syllabi": {},
-      "totalScore": 338,
-      "maxPossibleScore": 400
+      "totalScore": 338.5,
+      "maxPossibleScore": 400,
+      "academicPercent": 83,
+      "classPerformancePercent": 91
     },
     {
       "studentId": "std_1789411405145",
@@ -232,7 +249,7 @@
         "subcat_qn_f2": 25,
         "subcat_qn_f3": 25,
         "subcat_qn_f4": 25,
-        "subcat_punkt": 25,
+        "subcat_punkt": 24,
         "subcat_hw": 25,
         "subcat_mitarb": 25,
         "subcat_adhab": 25,
@@ -244,8 +261,10 @@
         "co_1789064756155": 25
       },
       "syllabi": {},
-      "totalScore": 399,
-      "maxPossibleScore": 400
+      "totalScore": 398,
+      "maxPossibleScore": 400,
+      "academicPercent": 100,
+      "classPerformancePercent": 99
     },
     {
       "studentId": "std_1789411793999",
@@ -257,7 +276,7 @@
         "subcat_ai_f1": 22,
         "subcat_ai_f2": 23,
         "subcat_ai_f3": 24,
-        "subcat_ai_f4": 21,
+        "subcat_ai_f4": 20.5,
         "subcat_qn_f1": 23.5,
         "subcat_qn_f2": 24,
         "subcat_qn_f3": 18,
@@ -274,8 +293,10 @@
         "co_1789064756155": 25
       },
       "syllabi": {},
-      "totalScore": 371.5,
-      "maxPossibleScore": 400
+      "totalScore": 371,
+      "maxPossibleScore": 400,
+      "academicPercent": 88,
+      "classPerformancePercent": 96
     },
     {
       "studentId": "std_1789413543033",
@@ -283,7 +304,7 @@
       "familyName": "Sekh",
       "level": "lvl_1788864109056",
       "scores": {
-        "sub_1788864142240": 64,
+        "sub_1788864142240": 68,
         "sub_1788864161088": 69,
         "sub_1788864174755": 35,
         "subcat_punkt_1788864109056": 20,
@@ -298,8 +319,10 @@
       "syllabi": {
         "sub_1788864142240": "Juz 30"
       },
-      "totalScore": 282,
-      "maxPossibleScore": 450
+      "totalScore": 286,
+      "maxPossibleScore": 450,
+      "academicPercent": 69,
+      "classPerformancePercent": 89
     },
     {
       "studentId": "std_1789414168885",
@@ -313,7 +336,7 @@
         "heoar": 42,
         "arabische_schrift": 34,
         "nahu": 70,
-        "seerah": 90,
+        "seerah": 94,
         "pünktlichkeit": 23,
         "hausaufgaben": 24,
         "mitarbeit": 25,
@@ -325,7 +348,9 @@
       },
       "syllabi": {},
       "totalScore": 589,
-      "maxPossibleScore": 700
+      "maxPossibleScore": 700,
+      "academicPercent": 78,
+      "classPerformancePercent": 97
     },
     {
       "studentId": "std_1789414856845",
@@ -342,7 +367,7 @@
         "subcat_qn_f2": 25,
         "subcat_qn_f3": 25,
         "subcat_qn_f4": 20,
-        "subcat_punkt": 20,
+        "subcat_punkt": 21,
         "subcat_hw": 23,
         "subcat_mitarb": 25,
         "subcat_adhab": 25,
@@ -353,36 +378,42 @@
         "co_1789064756155": 25
       },
       "syllabi": {},
-      "totalScore": 379,
-      "maxPossibleScore": 400
+      "totalScore": 380,
+      "maxPossibleScore": 400,
+      "academicPercent": 93,
+      "classPerformancePercent": 94
     },
     {
-      "studentId": "std_1789422248365",
-      "firstName": "Unaisah",
-      "familyName": "Chowdhury",
+      "studentId": "std_1789507064581",
+      "firstName": "Manha",
+      "familyName": "Afroz",
       "level": "noorani",
-      "subLevel": "nl_1",
+      "subLevel": "nl_7",
       "scores": {
-        "subcat_ai_f1": 20,
-        "subcat_ai_f2": 20,
-        "subcat_ai_f3": 20,
-        "subcat_ai_f4": 20.5,
-        "subcat_qn_f1": 20.5,
-        "subcat_qn_f2": 21.5,
-        "subcat_qn_f3": 19,
-        "subcat_qn_f4": 19,
-        "subcat_punkt": 20,
-        "subcat_hw": 22,
+        "subcat_ai_f1": 25,
+        "subcat_ai_f2": 25,
+        "subcat_ai_f3": 25,
+        "subcat_ai_f4": 25,
+        "subcat_qn_f1": 25,
+        "subcat_qn_f2": 25,
+        "subcat_qn_f3": 25,
+        "subcat_qn_f4": 25,
+        "subcat_punkt": 23,
+        "subcat_hw": 24,
         "subcat_mitarb": 25,
         "subcat_adhab": 25,
-        "sports_day": 25,
-        "islamische_bildung": 25,
+        "sub_1788982008540": "Sehr Gut",
+        "sub_1789033549108": 90,
         "science_club": 25,
-        "co_1789064756155": 24
+        "islamische_bildung": 25,
+        "co_1789064756155": 25,
+        "sports_day": 15
       },
       "syllabi": {},
-      "totalScore": 351.5,
-      "maxPossibleScore": 400
+      "totalScore": 387,
+      "maxPossibleScore": 400,
+      "academicPercent": 100,
+      "classPerformancePercent": 97
     }
   ]
 }

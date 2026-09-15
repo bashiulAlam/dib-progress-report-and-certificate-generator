@@ -33,7 +33,7 @@ export const KidsCertificateCard: React.FC<KidsCertificateCardProps> = ({
       {/* --- 2. Footer Section (Adjusted margins to clear illustrations) --- */}
       <div className="absolute bottom-[5%] left-0 right-0 z-10 flex justify-between items-end px-28">
         {/* Bottom Left: Ort und Datum (Moved right to clear the book illustration) */}
-        <div className="text-center w-52 ml-24">
+        <div className="text-center w-48 ml-32">
           <p className="text-xs font-semibold text-gray-800 border-b border-dashed border-gray-600 pb-0.5 min-h-[18px]">
             {locationAndDate}
           </p>
@@ -43,7 +43,7 @@ export const KidsCertificateCard: React.FC<KidsCertificateCardProps> = ({
         </div>
 
         {/* Bottom Right: Headmaster Signature */}
-        <div className="text-center w-52 mr-6">
+        <div className="text-center w-48 mr-32">
           <div className="h-10 flex items-end justify-center mb-0.5">
             <img
               src="/assets/signature-schulleiter.png"

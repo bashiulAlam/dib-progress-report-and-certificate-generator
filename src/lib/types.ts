@@ -70,6 +70,8 @@ export interface StudentScore {
   coCurricularScores?: Record<string, number>;
   totalScore: number;
   maxPossibleScore: number;
+  academicPercent?: number;
+  classPerformancePercent?: number;
   syllabi?: Record<string, string>;
 }
 
