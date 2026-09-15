@@ -9,6 +9,9 @@ import { calculateStudentTotal } from "@/lib/utils";
 import { Printer } from "lucide-react";
 import BulkPrintModal from "@/components/BulkPrintModal";
 
+import { Award } from "lucide-react";
+import CertificateModal from "@/components/CertificateModal";
+
 const DRAFT_STORAGE_KEY = "progress_report_unsaved_session";
 const ACTIVE_FILE_KEY = "progress_report_active_file";
 
@@ -18,6 +21,7 @@ export default function HomeSPA() {
   const [loading, setLoading] = useState(true);
   const [selectedPrintStudent, setSelectedPrintStudent] = useState<StudentScore | null>(null);
   const [showBulkPrintModal, setShowBulkPrintModal] = useState(false);
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
 
   const [activeFileName, setActiveFileName] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -495,6 +499,14 @@ export default function HomeSPA() {
           >
             <Printer size={16} className="text-blue-600" /> Bulk Print Reports
           </button>
+
+          <button
+            onClick={() => setIsCertModalOpen(true)}
+            className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium px-3.5 py-2 rounded-md text-sm transition-colors shadow-sm"
+          >
+            <Award className="h-4 w-4" />
+            <span>Certificates</span>
+          </button>
         </div>
 
         {/* Compact Table View */}
@@ -935,6 +947,14 @@ export default function HomeSPA() {
         config={config}
         defaultLevelId={selectedLevelId}
         defaultSubLevelId={selectedSubLevelId}
+      />
+
+      {/* Certificate Modal */}
+      <CertificateModal
+        isOpen={isCertModalOpen}
+        onClose={() => setIsCertModalOpen(false)}
+        session={session}
+        config={config}
       />
     </div>
   );
