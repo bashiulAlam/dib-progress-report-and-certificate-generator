@@ -20,6 +20,18 @@ export const KidsCertificateCard: React.FC<KidsCertificateCardProps> = ({
         className="absolute inset-0 w-full h-full object-cover z-0"
       />
 
+      {/* WATERMARK LOGO */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+        aria-hidden="true"
+      >
+        <img
+          src="/assets/dib-logo.png"
+          alt=""
+          className="w-[450px] max-w-[50%] h-auto object-contain opacity-[0.06] select-none"
+        />
+      </div>
+
       {/* --- 1. Student Name (Positioned over the dashed yellow line) --- */}
       <div className="absolute top-[43.5%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] text-center z-10">
         <h2
