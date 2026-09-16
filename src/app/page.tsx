@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
-import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus, AlertTriangle } from "lucide-react";
+import { Eye, FilePlus, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus, AlertTriangle } from "lucide-react";
 import StudentReportCard from "@/components/StudentReportCard";
 import { calculateStudentTotal } from "@/lib/utils";
 
@@ -118,6 +118,25 @@ export default function HomeSPA() {
       return;
     }
     await saveSessionToFile(session, targetFileName);
+  };
+
+  const handleNewSession = () => {
+    const confirmReset = window.confirm(
+      "Are you sure you want to start a new session? Unsaved changes in the current session will be lost."
+    );
+
+    if (confirmReset) {
+      // Reset session state to empty default structure
+      setSession({
+        term: `Term 1 - ${new Date().getFullYear()}`,
+        date: new Date().toISOString().split("T")[0],
+        students: [],
+      });
+
+      // Clear active modal edit indexes and search query
+      setActiveEditIndex(null);
+      setSearchQuery("");
+    }
   };
 
   const saveSessionToFile = async (dataToSave: ExamSession, targetFileName: string) => {
@@ -414,30 +433,49 @@ export default function HomeSPA() {
     <div className="min-h-screen bg-gray-50 p-8 print:hidden">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-white p-6 rounded-lg border shadow-xs">
-        <div className="flex items-center gap-4">
+        {/* Left Column: Logo + Academy Name underneath */}
+        <div className="flex flex-col items-center gap-1">
           <img
             src="/assets/dib-logo.png"
             alt="Academy Logo"
-            className="h-12 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{config.academyName}</h1>
-            <p className="text-sm text-gray-500">
-              Current File: <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
-            </p>
-          </div>
+          <h2 className="text-sm font-semibold text-gray-700">
+            {config.academyName}
+          </h2>
         </div>
 
-        <div className="flex gap-3">
+        {/* Right Column: Title + Current File underneath */}
+        <div className="flex flex-col items-end gap-0.5">
+          <h1 className="text-2xl font-bold text-amber-900">
+            Progress Report and Certificate Generator
+          </h1>
+          <p className="text-xs text-gray-500">
+            Current File:{" "}
+            <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-4 mb-12 bg-white p-8 rounded-lg border shadow-xs">
+          <button
+            onClick={handleNewSession}
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
+            title="Clear current session and start a new batch"
+          >
+            <FilePlus className="h-4 w-4 text-emerald-400" />
+            <span>New Session</span>
+          </button>
+
           <button
             onClick={() => setShowLoadModal(true)}
-            className="flex items-center gap-2 border px-4 py-2 rounded hover:bg-gray-50 text-sm"
+            className="flex items-center gap-2 bg-red-800 hover:bg-red-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
           >
             <FolderOpen size={16} /> Open Files
           </button>
           <button
             onClick={handleManualSave}
-            className="flex items-center gap-2 bg-emerald-700 text-white px-4 py-2 rounded hover:bg-emerald-800 text-sm"
+            className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
           >
             <Save size={16} /> Save JSON
           </button>
@@ -446,11 +484,10 @@ export default function HomeSPA() {
             onClick={() => {
               window.location.assign("/admin");
             }}
-            className="flex items-center gap-2 border px-4 py-2 rounded hover:bg-gray-50 text-sm"
+            className="flex items-center gap-2 bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
           >
             <Settings size={16} /> Admin Panel
           </button>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6">
