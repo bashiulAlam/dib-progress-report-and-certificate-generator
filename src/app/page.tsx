@@ -6,6 +6,7 @@ import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileTe
 import StudentReportCard from "@/components/StudentReportCard";
 import { calculateStudentTotal } from "@/lib/utils";
 
+import { Search } from "lucide-react";
 import { Printer } from "lucide-react";
 import BulkPrintModal from "@/components/BulkPrintModal";
 
@@ -57,6 +58,7 @@ export default function HomeSPA() {
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [activeEditIndex, setActiveEditIndex] = useState<number | null>(null);
   const [isNewStudent, setIsNewStudent] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // State for delete confirmation modal
   const [studentToDeleteIndex, setStudentToDeleteIndex] = useState<number | null>(null);
@@ -379,6 +381,14 @@ export default function HomeSPA() {
   const filteredStudents = currentStudents.filter((std) => {
     if (selectedLevelId !== "ALL" && std.level !== selectedLevelId) return false;
     if (selectedSubLevelId !== "ALL" && std.subLevel !== selectedSubLevelId) return false;
+
+    if (searchQuery.trim() !== "") {
+      const fullName = `${std.firstName} ${std.familyName}`.toLowerCase();
+      if (!fullName.includes(searchQuery.toLowerCase().trim())) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -463,37 +473,6 @@ export default function HomeSPA() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-gray-50 p-1 border rounded">
-              <span className="text-xs text-gray-500 px-2 font-medium">Filter:</span>
-              <select
-                value={selectedLevelId}
-                onChange={(e) => handleLevelFilterChange(e.target.value)}
-                className="border-none bg-transparent text-sm font-medium focus:ring-0"
-              >
-                <option value="ALL">All Levels</option>
-                {config.levels.map((lvl) => (
-                  <option key={lvl.id} value={lvl.id}>
-                    {lvl.name}
-                  </option>
-                ))}
-              </select>
-
-              {activeLevelFilterConfig?.subLevels && activeLevelFilterConfig.subLevels.length > 0 && (
-                <select
-                  value={selectedSubLevelId}
-                  onChange={(e) => setSelectedSubLevelId(e.target.value)}
-                  className="border-none bg-transparent text-sm font-medium text-blue-900 focus:ring-0"
-                >
-                  <option value="ALL">All Sub-Levels</option>
-                  {activeLevelFilterConfig.subLevels.map((subLvl) => (
-                    <option key={subLvl.id} value={subLvl.id}>
-                      {subLvl.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
             <button
               onClick={openNewStudentModal}
               className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 font-medium"
@@ -516,6 +495,61 @@ export default function HomeSPA() {
             <Award className="h-4 w-4" />
             <span>Certificates</span>
           </button>
+        </div>
+
+        {/* Dedicated Search & Filter Bar */}
+        <div className="bg-white p-4 rounded-lg border shadow-xs flex items-center justify-between gap-4">
+          {/* Search Bar Input */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search student by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-8 border border-gray-300 p-2 rounded-md text-sm w-full focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Level / Sub-Level Dropdown Filters */}
+          <div className="flex items-center gap-2 bg-gray-50 p-1.5 border border-gray-200 rounded-md">
+            <span className="text-xs text-gray-500 px-2 font-medium">Filter:</span>
+            <select
+              value={selectedLevelId}
+              onChange={(e) => handleLevelFilterChange(e.target.value)}
+              className="border-none bg-transparent text-sm font-medium text-gray-700 focus:ring-0 cursor-pointer"
+            >
+              <option value="ALL">All Levels</option>
+              {config.levels.map((lvl) => (
+                <option key={lvl.id} value={lvl.id}>
+                  {lvl.name}
+                </option>
+              ))}
+            </select>
+
+            {activeLevelFilterConfig?.subLevels && activeLevelFilterConfig.subLevels.length > 0 && (
+              <select
+                value={selectedSubLevelId}
+                onChange={(e) => setSelectedSubLevelId(e.target.value)}
+                className="border-none bg-transparent text-sm font-medium text-blue-900 focus:ring-0 cursor-pointer border-l border-gray-300 pl-2"
+              >
+                <option value="ALL">All Sub-Levels</option>
+                {activeLevelFilterConfig.subLevels.map((subLvl) => (
+                  <option key={subLvl.id} value={subLvl.id}>
+                    {subLvl.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         {/* Compact Table View */}
