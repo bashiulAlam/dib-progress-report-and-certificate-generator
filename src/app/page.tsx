@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
-import { Eye, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus, AlertTriangle } from "lucide-react";
+import { Eye, FilePlus, Save, FolderOpen, UserPlus, Settings, Trash2, Edit3, Check, FileText, X, Plus, AlertTriangle } from "lucide-react";
 import StudentReportCard from "@/components/StudentReportCard";
 import { calculateStudentTotal } from "@/lib/utils";
 
+import { Search } from "lucide-react";
 import { Printer } from "lucide-react";
 import BulkPrintModal from "@/components/BulkPrintModal";
 
@@ -57,6 +58,7 @@ export default function HomeSPA() {
   const [showLoadModal, setShowLoadModal] = useState(false);
   const [activeEditIndex, setActiveEditIndex] = useState<number | null>(null);
   const [isNewStudent, setIsNewStudent] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // State for delete confirmation modal
   const [studentToDeleteIndex, setStudentToDeleteIndex] = useState<number | null>(null);
@@ -116,6 +118,25 @@ export default function HomeSPA() {
       return;
     }
     await saveSessionToFile(session, targetFileName);
+  };
+
+  const handleNewSession = () => {
+    const confirmReset = window.confirm(
+      "Are you sure you want to start a new session? Unsaved changes in the current session will be lost."
+    );
+
+    if (confirmReset) {
+      // Reset session state to empty default structure
+      setSession({
+        term: `Term 1 - ${new Date().getFullYear()}`,
+        date: new Date().toISOString().split("T")[0],
+        students: [],
+      });
+
+      // Clear active modal edit indexes and search query
+      setActiveEditIndex(null);
+      setSearchQuery("");
+    }
   };
 
   const saveSessionToFile = async (dataToSave: ExamSession, targetFileName: string) => {
@@ -379,6 +400,14 @@ export default function HomeSPA() {
   const filteredStudents = currentStudents.filter((std) => {
     if (selectedLevelId !== "ALL" && std.level !== selectedLevelId) return false;
     if (selectedSubLevelId !== "ALL" && std.subLevel !== selectedSubLevelId) return false;
+
+    if (searchQuery.trim() !== "") {
+      const fullName = `${std.firstName} ${std.familyName}`.toLowerCase();
+      if (!fullName.includes(searchQuery.toLowerCase().trim())) {
+        return false;
+      }
+    }
+
     return true;
   });
 
@@ -404,30 +433,49 @@ export default function HomeSPA() {
     <div className="min-h-screen bg-gray-50 p-8 print:hidden">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-white p-6 rounded-lg border shadow-xs">
-        <div className="flex items-center gap-4">
+        {/* Left Column: Logo + Academy Name underneath */}
+        <div className="flex flex-col items-center gap-1">
           <img
             src="/assets/dib-logo.png"
             alt="Academy Logo"
-            className="h-12 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{config.academyName}</h1>
-            <p className="text-sm text-gray-500">
-              Current File: <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
-            </p>
-          </div>
+          <h2 className="text-sm font-semibold text-gray-700">
+            {config.academyName}
+          </h2>
         </div>
 
-        <div className="flex gap-3">
+        {/* Right Column: Title + Current File underneath */}
+        <div className="flex flex-col items-end gap-0.5">
+          <h1 className="text-2xl font-bold text-amber-900">
+            Progress Report and Certificate Generator
+          </h1>
+          <p className="text-xs text-gray-500">
+            Current File:{" "}
+            <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-4 mb-12 bg-white p-8 rounded-lg border shadow-xs">
+          <button
+            onClick={handleNewSession}
+            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
+            title="Clear current session and start a new batch"
+          >
+            <FilePlus className="h-4 w-4 text-emerald-400" />
+            <span>New Session</span>
+          </button>
+
           <button
             onClick={() => setShowLoadModal(true)}
-            className="flex items-center gap-2 border px-4 py-2 rounded hover:bg-gray-50 text-sm"
+            className="flex items-center gap-2 bg-red-800 hover:bg-red-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
           >
             <FolderOpen size={16} /> Open Files
           </button>
           <button
             onClick={handleManualSave}
-            className="flex items-center gap-2 bg-emerald-700 text-white px-4 py-2 rounded hover:bg-emerald-800 text-sm"
+            className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
           >
             <Save size={16} /> Save JSON
           </button>
@@ -436,11 +484,10 @@ export default function HomeSPA() {
             onClick={() => {
               window.location.assign("/admin");
             }}
-            className="flex items-center gap-2 border px-4 py-2 rounded hover:bg-gray-50 text-sm"
+            className="flex items-center gap-2 bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
           >
             <Settings size={16} /> Admin Panel
           </button>
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6">
@@ -463,37 +510,6 @@ export default function HomeSPA() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-gray-50 p-1 border rounded">
-              <span className="text-xs text-gray-500 px-2 font-medium">Filter:</span>
-              <select
-                value={selectedLevelId}
-                onChange={(e) => handleLevelFilterChange(e.target.value)}
-                className="border-none bg-transparent text-sm font-medium focus:ring-0"
-              >
-                <option value="ALL">All Levels</option>
-                {config.levels.map((lvl) => (
-                  <option key={lvl.id} value={lvl.id}>
-                    {lvl.name}
-                  </option>
-                ))}
-              </select>
-
-              {activeLevelFilterConfig?.subLevels && activeLevelFilterConfig.subLevels.length > 0 && (
-                <select
-                  value={selectedSubLevelId}
-                  onChange={(e) => setSelectedSubLevelId(e.target.value)}
-                  className="border-none bg-transparent text-sm font-medium text-blue-900 focus:ring-0"
-                >
-                  <option value="ALL">All Sub-Levels</option>
-                  {activeLevelFilterConfig.subLevels.map((subLvl) => (
-                    <option key={subLvl.id} value={subLvl.id}>
-                      {subLvl.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
             <button
               onClick={openNewStudentModal}
               className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 font-medium"
@@ -516,6 +532,61 @@ export default function HomeSPA() {
             <Award className="h-4 w-4" />
             <span>Certificates</span>
           </button>
+        </div>
+
+        {/* Dedicated Search & Filter Bar */}
+        <div className="bg-white p-4 rounded-lg border shadow-xs flex items-center justify-between gap-4">
+          {/* Search Bar Input */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search student by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-8 border border-gray-300 p-2 rounded-md text-sm w-full focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Level / Sub-Level Dropdown Filters */}
+          <div className="flex items-center gap-2 bg-gray-50 p-1.5 border border-gray-200 rounded-md">
+            <span className="text-xs text-gray-500 px-2 font-medium">Filter:</span>
+            <select
+              value={selectedLevelId}
+              onChange={(e) => handleLevelFilterChange(e.target.value)}
+              className="border-none bg-transparent text-sm font-medium text-gray-700 focus:ring-0 cursor-pointer"
+            >
+              <option value="ALL">All Levels</option>
+              {config.levels.map((lvl) => (
+                <option key={lvl.id} value={lvl.id}>
+                  {lvl.name}
+                </option>
+              ))}
+            </select>
+
+            {activeLevelFilterConfig?.subLevels && activeLevelFilterConfig.subLevels.length > 0 && (
+              <select
+                value={selectedSubLevelId}
+                onChange={(e) => setSelectedSubLevelId(e.target.value)}
+                className="border-none bg-transparent text-sm font-medium text-blue-900 focus:ring-0 cursor-pointer border-l border-gray-300 pl-2"
+              >
+                <option value="ALL">All Sub-Levels</option>
+                {activeLevelFilterConfig.subLevels.map((subLvl) => (
+                  <option key={subLvl.id} value={subLvl.id}>
+                    {subLvl.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
         </div>
 
         {/* Compact Table View */}
