@@ -13,6 +13,9 @@ import BulkPrintModal from "@/components/BulkPrintModal";
 import { Award } from "lucide-react";
 import CertificateModal from "@/components/CertificateModal";
 
+import { Contact } from "lucide-react";
+import IdCardModal from "@/components/IdCardModal";
+
 const DRAFT_STORAGE_KEY = "progress_report_unsaved_session";
 const ACTIVE_FILE_KEY = "progress_report_active_file";
 
@@ -23,6 +26,7 @@ export default function HomeSPA() {
   const [selectedPrintStudent, setSelectedPrintStudent] = useState<StudentScore | null>(null);
   const [showBulkPrintModal, setShowBulkPrintModal] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
+  const [isIdCardModalOpen, setIsIdCardModalOpen] = useState<boolean>(false);
 
   const [activeFileName, setActiveFileName] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -458,36 +462,44 @@ export default function HomeSPA() {
       </div>
 
       <div className="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-4 mb-12 bg-white p-8 rounded-lg border shadow-xs">
-          <button
-            onClick={handleNewSession}
-            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
-            title="Clear current session and start a new batch"
-          >
-            <FilePlus className="h-4 w-4 text-emerald-400" />
-            <span>New Session</span>
-          </button>
+        <button
+          onClick={handleNewSession}
+          className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
+          title="Clear current session and start a new batch"
+        >
+          <FilePlus className="h-4 w-4 text-emerald-400" />
+          <span>New Session</span>
+        </button>
 
-          <button
-            onClick={() => setShowLoadModal(true)}
-            className="flex items-center gap-2 bg-red-800 hover:bg-red-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
-          >
-            <FolderOpen size={16} /> Open Files
-          </button>
-          <button
-            onClick={handleManualSave}
-            className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
-          >
-            <Save size={16} /> Save JSON
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              window.location.assign("/admin");
-            }}
-            className="flex items-center gap-2 bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
-          >
-            <Settings size={16} /> Admin Panel
-          </button>
+        <button
+          onClick={() => setShowLoadModal(true)}
+          className="flex items-center gap-2 bg-red-800 hover:bg-red-700 text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-700 shadow-xs cursor-pointer"
+        >
+          <FolderOpen size={16} /> Open Files
+        </button>
+        <button
+          onClick={handleManualSave}
+          className="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
+        >
+          <Save size={16} /> Save JSON
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            window.location.assign("/admin");
+          }}
+          className="flex items-center gap-2 bg-green-800 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
+        >
+          <Settings size={16} /> Admin Panel
+        </button>
+        {/* NEW ID Card Generator Button */}
+        <button
+          onClick={() => setIsIdCardModalOpen(true)}
+          className="flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-xs cursor-pointer"
+        >
+          <Contact className="h-4 w-4" />
+          <span>ID Card Generator</span>
+        </button>
       </div>
 
       <div className="max-w-7xl mx-auto space-y-6">
@@ -1044,6 +1056,13 @@ export default function HomeSPA() {
         onClose={() => setIsCertModalOpen(false)}
         session={session}
         config={config}
+      />
+
+      {/* ID Card Modal */}
+      <IdCardModal
+        isOpen={isIdCardModalOpen}
+        onClose={() => setIsIdCardModalOpen(false)}
+        defaultAcademyName={config.academyName}
       />
     </div>
   );
