@@ -104,6 +104,19 @@ export default function IdCardModal({
     </>
   );
 
+  {/* Grid Cut Overlay Lines Component (Centered in the 8mm gaps) */}
+  const GridCutLines = () => (
+    <div className="absolute inset-0 pointer-events-none z-20">
+      {/* Vertical Cut Lines */}
+      <div className="absolute top-0 bottom-0 left-[58mm] border-l border-dashed border-gray-400" />
+      <div className="absolute top-0 bottom-0 left-[120mm] border-l border-dashed border-gray-400" />
+
+      {/* Horizontal Cut Lines */}
+      <div className="absolute left-0 right-0 top-[89mm] border-t border-dashed border-gray-400" />
+      <div className="absolute left-0 right-0 top-[182mm] border-t border-dashed border-gray-400" />
+    </div>
+  );
+
   return (
     <>
       {/* UI Controls Modal (Screen Only) */}
@@ -193,7 +206,6 @@ export default function IdCardModal({
                     <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
                     <CornerOrnaments />
 
-                    {/* Front Watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                       <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
                     </div>
@@ -221,7 +233,6 @@ export default function IdCardModal({
                     <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
                     <CornerOrnaments />
 
-                    {/* Back Watermark */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                       <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
                     </div>
@@ -243,7 +254,6 @@ export default function IdCardModal({
                       </p>
                     </div>
 
-                    {/* Headmaster Signature Footer */}
                     <div className="w-full z-10 pb-0.5">
                       <div className="h-10 flex items-end justify-center mb-0.5">
                         <img src="/assets/signature-schulleiter.png" alt="" className="max-h-10 object-contain" />
@@ -275,7 +285,7 @@ export default function IdCardModal({
         </div>
       </div>
 
-      {/* --- PRINTABLE PORTAL TARGET (Portaled to document.body, like BulkPrintModal & CertificateModal) --- */}
+      {/* --- PRINTABLE PORTAL TARGET --- */}
       {mounted &&
         pages.length > 0 &&
         createPortal(
@@ -297,97 +307,106 @@ export default function IdCardModal({
                 <React.Fragment key={`page-pair-${pageIdx}`}>
                   {/* PAGE A: FRONTS */}
                   <div
-                    className="w-[210mm] h-[296mm] p-[10mm] mx-auto bg-white box-border flex flex-wrap content-start gap-[4mm] overflow-hidden"
+                    className="w-[210mm] h-[297mm] pt-[13mm] pb-[13mm] pl-[16mm] pr-[16mm] mx-auto bg-white box-border overflow-hidden"
                     style={{ pageBreakAfter: "always", breakAfter: "page" }}
                   >
-                    {pageStudents.map((std, idx) => (
-                      <div
-                        key={`front-${idx}`}
-                        className="w-[54mm] h-[85mm] border-4 border-[#8C6212] rounded-xs p-2 flex flex-col justify-between items-center text-center relative box-border overflow-hidden font-serif"
-                      >
-                        <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
-                        <CornerOrnaments />
+                    {/* 3x3 Cards Grid Container */}
+                    <div className="flex flex-wrap content-start gap-[8mm] w-[178mm] h-[271mm] relative z-10">
+                      {/* Uniform Grid Cut Lines */}
+                      <GridCutLines />
 
-                        {/* Front Watermark */}
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                          <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
-                        </div>
+                      {pageStudents.map((std, idx) => (
+                        <div
+                          key={`front-${idx}`}
+                          className="w-[54mm] h-[85mm] border-4 border-[#8C6212] rounded-xs p-2 flex flex-col justify-between items-center text-center relative box-border overflow-hidden font-serif bg-white z-10"
+                        >
+                          <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
+                          <CornerOrnaments />
 
-                        <div className="pt-2 z-10">
-                          <img src="/assets/dib-logo.png" alt="" className="h-9 w-auto mx-auto mb-1 object-contain" />
-                          <h3 className="text-[10px] font-bold text-gray-900 tracking-wider uppercase">{academyName}</h3>
-                          <p className="text-[8.5px] text-[#8C6212] font-bold">Schuljahr {academicYear}</p>
-                        </div>
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                            <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
+                          </div>
 
-                        <div className="my-auto px-1 w-full z-10">
-                          <div className="border-b-2 border-dashed border-[#8C6212] pb-1.5">
-                            <p className="text-base font-semibold text-[#144428] leading-tight italic font-serif">
-                              {std.firstName} {std.lastName}
+                          <div className="pt-2 z-10">
+                            <img src="/assets/dib-logo.png" alt="" className="h-9 w-auto mx-auto mb-1 object-contain" />
+                            <h3 className="text-[10px] font-bold text-gray-900 tracking-wider uppercase">{academyName}</h3>
+                            <p className="text-[8.5px] text-[#8C6212] font-bold">Schuljahr {academicYear}</p>
+                          </div>
+
+                          <div className="my-auto px-1 w-full z-10">
+                            <div className="border-b-2 border-dashed border-[#8C6212] pb-1.5">
+                              <p className="text-base font-semibold text-[#144428] leading-tight italic font-serif">
+                                {std.firstName} {std.lastName}
+                              </p>
+                            </div>
+                            <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mt-1.5">
+                              Schülerausweis
                             </p>
                           </div>
-                          <p className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mt-1.5">
-                            Schülerausweis
-                          </p>
-                        </div>
 
-                        <div className="pb-1 text-[7.5px] font-semibold text-gray-500 z-10">DIB Academy Berlin</div>
-                      </div>
-                    ))}
+                          <div className="pb-1 text-[7.5px] font-semibold text-gray-500 z-10">DIB Academy Berlin</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* PAGE B: BACKS (Horizontally Mirrored Grid) */}
+                  {/* PAGE B: BACKS (Horizontally Mirrored) */}
                   <div
-                    className="w-[210mm] h-[296mm] p-[10mm] mx-auto bg-white box-border flex flex-wrap content-start gap-[4mm] overflow-hidden"
+                    className="w-[210mm] h-[297mm] pt-[13mm] pb-[13mm] pl-[16mm] pr-[16mm] mx-auto bg-white box-border overflow-hidden"
                     style={{
                       pageBreakAfter: pageIdx === pages.length - 1 ? "avoid" : "always",
                       breakAfter: pageIdx === pages.length - 1 ? "avoid" : "page",
                     }}
                   >
-                    {Array.from({ length: Math.ceil(pageStudents.length / 3) }).map((_, rowIndex) => {
-                      const rowItems = pageStudents.slice(rowIndex * 3, rowIndex * 3 + 3);
-                      const mirroredRowItems = [...rowItems].reverse();
+                    {/* 3x3 Cards Grid Container */}
+                    <div className="flex flex-wrap content-start gap-[8mm] w-[178mm] h-[271mm] relative z-10">
+                      {/* Uniform Grid Cut Lines */}
+                      <GridCutLines />
 
-                      return mirroredRowItems.map((std, idx) => (
-                        <div
-                          key={`back-${rowIndex}-${idx}`}
-                          className="w-[54mm] h-[85mm] border-4 border-[#8C6212] rounded-xs p-2.5 flex flex-col justify-between items-center text-center relative box-border overflow-hidden font-serif"
-                        >
-                          <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
-                          <CornerOrnaments />
+                      {Array.from({ length: Math.ceil(pageStudents.length / 3) }).map((_, rowIndex) => {
+                        const rowItems = pageStudents.slice(rowIndex * 3, rowIndex * 3 + 3);
+                        const mirroredRowItems = [...rowItems].reverse();
 
-                          {/* Back Watermark */}
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                            <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
-                          </div>
+                        return mirroredRowItems.map((std, idx) => (
+                          <div
+                            key={`back-${rowIndex}-${idx}`}
+                            className="w-[54mm] h-[85mm] border-4 border-[#8C6212] rounded-xs p-2.5 flex flex-col justify-between items-center text-center relative box-border overflow-hidden font-serif bg-white z-10"
+                          >
+                            <div className="absolute inset-1 border border-dashed border-[#8C6212]/70 pointer-events-none" />
+                            <CornerOrnaments />
 
-                          <div className="pt-1.5 z-10">
-                            <p className="text-[9.5px] font-bold text-[#8C6212] uppercase tracking-wider">Finderlohn / Return Info</p>
-                            <div className="w-8 h-0.5 bg-[#8C6212] mx-auto mt-0.5" />
-                          </div>
-
-                          <div className="space-y-1.5 text-[8.5px] text-gray-800 leading-tight z-10 my-auto">
-                            <p>
-                              Falls gefunden, bitte zurückgeben an:
-                              <br />
-                              <strong className="text-gray-900 font-bold">{academyName}</strong>
-                            </p>
-                            <p className="font-medium text-gray-700">{address}</p>
-                            <p className="text-[7.5px] text-gray-600 italic pt-1">
-                              Dieser Ausweis ist für das Schuljahr {academicYear} gültig.
-                            </p>
-                          </div>
-
-                          {/* Enlarged Headmaster Signature Block */}
-                          <div className="w-full z-10 pb-0.5">
-                            <div className="h-10 flex items-end justify-center mb-0.5">
-                              <img src="/assets/signature-schulleiter.png" alt="" className="max-h-10 object-contain" />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                              <img src="/assets/dib-logo.png" alt="" className="w-28 h-auto object-contain opacity-[0.05]" />
                             </div>
-                            <div className="w-32 mx-auto border-b border-gray-600 mb-0.5" />
-                            <p className="text-[7px] font-bold text-gray-600">Unterschrift des Schulleiters</p>
+
+                            <div className="pt-1.5 z-10">
+                              <p className="text-[9.5px] font-bold text-[#8C6212] uppercase tracking-wider">Finderlohn / Return Info</p>
+                              <div className="w-8 h-0.5 bg-[#8C6212] mx-auto mt-0.5" />
+                            </div>
+
+                            <div className="space-y-1.5 text-[8.5px] text-gray-800 leading-tight z-10 my-auto">
+                              <p>
+                                Falls gefunden, bitte zurückgeben an:
+                                <br />
+                                <strong className="text-gray-900 font-bold">{academyName}</strong>
+                              </p>
+                              <p className="font-medium text-gray-700">{address}</p>
+                              <p className="text-[7.5px] text-gray-600 italic pt-1">
+                                Dieser Ausweis ist für das Schuljahr {academicYear} gültig.
+                              </p>
+                            </div>
+
+                            <div className="w-full z-10 pb-0.5">
+                              <div className="h-10 flex items-end justify-center mb-0.5">
+                                <img src="/assets/signature-schulleiter.png" alt="" className="max-h-10 object-contain" />
+                              </div>
+                              <div className="w-32 mx-auto border-b border-gray-600 mb-0.5" />
+                              <p className="text-[7px] font-bold text-gray-600">Unterschrift des Schulleiters</p>
+                            </div>
                           </div>
-                        </div>
-                      ));
-                    })}
+                        ));
+                      })}
+                    </div>
                   </div>
                 </React.Fragment>
               );
