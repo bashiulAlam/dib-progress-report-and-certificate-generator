@@ -172,14 +172,52 @@
       "name": "Nafis Islam Khandoker",
       "age": 12,
       "gender": "M",
-      "ageGroup": "11 - 13"
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "partially",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "partially",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "Hat mutter in Hausarbeit geholfen",
+        "verdict": "Basic",
+        "bonusPoints": false
+      }
     },
     {
       "id": "std-1790712190242-16",
       "name": "Nazifa Ahmed",
       "age": 12,
       "gender": "W",
-      "ageGroup": "11 - 13"
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": true,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Advanced",
+        "bonusPoints": false
+      }
     },
     {
       "id": "std-1790712190242-17",
@@ -263,14 +301,44 @@
       "name": "Zaara Islam",
       "age": 6,
       "gender": "W",
-      "ageGroup": "< 7"
+      "ageGroup": "< 7",
+      "performance": {
+        "targetCriteria": {
+          "Basierend auf dem bereitgestellten Ramadan-Aktivitätenbuch": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": false
+      }
     },
     {
       "id": "std-1790712190242-29",
       "name": "Adifa Ahmed",
       "age": 6,
       "gender": "W",
-      "ageGroup": "< 7"
+      "ageGroup": "< 7",
+      "performance": {
+        "targetCriteria": {
+          "Basierend auf dem bereitgestellten Ramadan-Aktivitätenbuch": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": false
+      }
     },
     {
       "id": "std-1790712190242-30",
@@ -347,7 +415,26 @@
       "name": "Zumana Islam",
       "age": 12,
       "gender": "W",
-      "ageGroup": "11 - 13"
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Basic",
+        "bonusPoints": true
+      }
     },
     {
       "id": "std-1790712190242-41",
@@ -448,5 +535,5 @@
       "ageGroup": "Unassigned"
     }
   ],
-  "updatedAt": "2026-09-29T20:33:01.934Z"
+  "updatedAt": "2026-09-29T20:56:48.495Z"
 }
