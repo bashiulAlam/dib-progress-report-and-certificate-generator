@@ -68,13 +68,55 @@
       ]
     }
   ],
+  "verdictOptions": [
+    {
+      "id": "verdict-1",
+      "name": "Entry",
+      "prizeMoney": 15
+    },
+    {
+      "id": "verdict-2",
+      "name": "Basic",
+      "prizeMoney": 25
+    },
+    {
+      "id": "verdict-3",
+      "name": "Advanced",
+      "prizeMoney": 35
+    },
+    {
+      "id": "verdict-1790717947859",
+      "name": "Maestro",
+      "prizeMoney": 50
+    }
+  ],
+  "bonusPrizeMoney": 5,
   "students": [
     {
       "id": "std-1790712190242-1",
       "name": "Faiyaz Karim",
       "age": 9,
       "gender": "M",
-      "ageGroup": "9 - 10"
+      "ageGroup": "9 - 10",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete": "fully",
+          "Koranrezitation: mindestens 15 Juz": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 10 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": true
+        },
+        "customCriteria": "Hat seinen Bruder geholfen",
+        "verdict": "Basic",
+        "bonusPoints": true
+      }
     },
     {
       "id": "std-1790712190242-2",
@@ -130,7 +172,7 @@
       "name": "Shanomi Osmany",
       "age": 14,
       "gender": "W",
-      "ageGroup": "> 13"
+      "ageGroup": "13+"
     },
     {
       "id": "std-1790712190242-10",
@@ -165,7 +207,7 @@
       "name": "Nishaj Araf Nasir",
       "age": 14,
       "gender": "M",
-      "ageGroup": "> 13"
+      "ageGroup": "13+"
     },
     {
       "id": "std-1790712190242-15",
@@ -535,5 +577,5 @@
       "ageGroup": "Unassigned"
     }
   ],
-  "updatedAt": "2026-09-29T20:56:48.495Z"
+  "updatedAt": "2026-09-29T21:39:11.740Z"
 }

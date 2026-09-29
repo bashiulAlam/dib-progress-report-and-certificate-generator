@@ -15,23 +15,14 @@ import {
     Star,
     Plus,
     Trash2,
+    FileText,
 } from "lucide-react";
 import {
     DEFAULT_RAMADAN_AGE_GROUPS,
+    DEFAULT_VERDICT_OPTIONS,
     RamadanAgeGroup,
+    VerdictOption,
 } from "../../data/ramadanRequirements";
-
-export interface VerdictOption {
-    id: string;
-    name: string;
-    prizeMoney: number;
-}
-
-export const DEFAULT_VERDICT_OPTIONS: VerdictOption[] = [
-    { id: "verdict-1", name: "Entry", prizeMoney: 15 },
-    { id: "verdict-2", name: "Basic", prizeMoney: 25 },
-    { id: "verdict-3", name: "Advanced", prizeMoney: 35 },
-];
 
 export interface StudentPerformance {
     targetCriteria: Record<string, "fully" | "partially" | "not_achieved">;
@@ -42,7 +33,7 @@ export interface StudentPerformance {
         taraweeh: boolean;
         uebernachtungMoschee: boolean;
     };
-    customCriteria: string;
+    customCriteria: string; // User input for additional tasks / notes
     verdict: string | null;
     bonusPoints: boolean;
 }
@@ -52,32 +43,18 @@ export interface RamadanStudent {
     name: string;
     age: number | null;
     gender: "Male" | "Female" | string;
-    ageGroup: "< 7" | "7 - 8" | "9 - 10" | "11 - 13" | "> 13" | "Unassigned";
+    ageGroup: string;
     performance?: StudentPerformance;
 }
 
-// Helper to map numeric age strictly to group label
 export const determineAgeGroup = (
-    age: number | null | undefined
-): RamadanStudent["ageGroup"] => {
+    age: number | null | undefined,
+    groups: RamadanAgeGroup[] = DEFAULT_RAMADAN_AGE_GROUPS
+): string => {
     if (age === null || age === undefined || isNaN(age)) return "Unassigned";
-    if (age < 7) return "< 7";
-    if (age <= 8) return "7 - 8";
-    if (age <= 10) return "9 - 10";
-    if (age <= 13) return "11 - 13";
-    return "> 13";
-};
 
-// Uniformly normalize label variations across inputs, filters, and state
-export const normalizeAgeGroup = (label: string | undefined | null): string => {
-    if (!label) return "unassigned";
-    const cleaned = label.trim().toLowerCase().replace(/^group\s*/, "");
-
-    if (cleaned.includes(">") || cleaned.includes("+") || cleaned === "13 - 15" || cleaned === "13-15") {
-        return "> 13";
-    }
-
-    return cleaned;
+    const matched = groups.find((g) => age >= g.ageMin && age <= g.ageMax);
+    return matched ? matched.label : "Unassigned";
 };
 
 export default function ProductiveRamadanView() {
@@ -91,15 +68,16 @@ export default function ProductiveRamadanView() {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("ALL");
 
-    // Editing State
+    // Inline Age Editing State
     const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
     const [editingAgeInput, setEditingAgeInput] = useState<string>("");
 
-    const [isLoadModalOpen, setIsLoadModalOpen] = useState(false);
+    // Load State File Selection Modal
+    const [isLoadModalOpen, setIsLoadModalOpen] = useState<boolean>(false);
     const [availableFiles, setAvailableFiles] = useState<{ fileName: string; updatedAt: string }[]>([]);
-    const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+    const [isLoadingFiles, setIsLoadingFiles] = useState<boolean>(false);
 
-    // Performance Modal State
+    // Performance Modal
     const [selectedStudentForPerformance, setSelectedStudentForPerformance] = useState<RamadanStudent | null>(null);
     const [performanceDraft, setPerformanceDraft] = useState<StudentPerformance>({
         targetCriteria: {},
@@ -115,26 +93,28 @@ export default function ProductiveRamadanView() {
         bonusPoints: false,
     });
 
-    // Load state from local storage on mount
+    // Load local storage data on mount
     useEffect(() => {
         const savedData = localStorage.getItem("productive_ramadan_data");
         if (savedData) {
             try {
                 const parsed = JSON.parse(savedData);
+                const loadedGroups = parsed.ageGroups || DEFAULT_RAMADAN_AGE_GROUPS;
+
                 if (parsed.students) {
                     const cleanedStudents = parsed.students.map((s: any) => ({
                         ...s,
                         age: typeof s.age === "number" && !isNaN(s.age) ? s.age : null,
-                        ageGroup: determineAgeGroup(s.age),
+                        ageGroup: determineAgeGroup(s.age, loadedGroups),
                     }));
                     setStudents(cleanedStudents);
                 }
                 if (parsed.year) setCompetitionYear(parsed.year);
-                if (parsed.ageGroups) setAgeGroups(parsed.ageGroups);
+                setAgeGroups(loadedGroups);
                 if (parsed.verdictOptions) setVerdictOptions(parsed.verdictOptions);
                 if (typeof parsed.bonusPrizeMoney === "number") setBonusPrizeMoney(parsed.bonusPrizeMoney);
             } catch (e) {
-                console.error("Error loading stored state", e);
+                console.error("Error loading local storage state", e);
             }
         }
     }, []);
@@ -158,64 +138,7 @@ export default function ProductiveRamadanView() {
         localStorage.setItem("productive_ramadan_data", JSON.stringify(payload));
     };
 
-    // Importer for CSV / TXT / Sheet data
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            const text = evt.target?.result as string;
-            if (!text) return;
-
-            const lines = text.split(/\r\n|\n/);
-            const parsed: RamadanStudent[] = [];
-
-            lines.forEach((line, idx) => {
-                const trimmed = line.trim();
-                if (!trimmed) return;
-
-                const delimiter = trimmed.includes(";") ? ";" : ",";
-                const cols = trimmed.split(delimiter).map((c) => c.replace(/^["']|["']$/g, "").trim());
-
-                // Skip Header row
-                if (
-                    idx === 0 &&
-                    (cols[0].toLowerCase().includes("name") ||
-                        (cols[1] && cols[1].toLowerCase().includes("age")) ||
-                        (cols[2] && cols[2].toLowerCase().includes("gender")))
-                ) {
-                    return;
-                }
-
-                if (cols.length >= 1) {
-                    const name = cols[0];
-                    const rawAgeCol = cols[1] ? cols[1].trim() : "";
-
-                    const hasDigits = /\d/.test(rawAgeCol);
-                    const age = hasDigits ? parseInt(rawAgeCol.replace(/\D/g, ""), 10) : null;
-
-                    const gender = cols[2] ? cols[2].trim() : "Unspecified";
-                    const calculatedGroup = determineAgeGroup(age);
-
-                    parsed.push({
-                        id: `std-${Date.now()}-${idx}`,
-                        name,
-                        age,
-                        gender,
-                        ageGroup: calculatedGroup,
-                    });
-                }
-            });
-
-            setStudents(parsed);
-            saveStateToStorage(parsed);
-        };
-
-        reader.readAsText(file);
-    };
-
-    // Export state to server
+    // Save JSON payload including updated verdicts & criteria to server
     const handleExportJSON = async () => {
         if (students.length === 0) return;
 
@@ -238,17 +161,16 @@ export default function ProductiveRamadanView() {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                alert(`File saved on server successfully!`);
+                alert(`Configuration & student records saved on server!`);
             } else {
-                alert(`Failed to save file on server: ${result.error}`);
+                alert(`Failed to save state on server: ${result.error}`);
             }
         } catch (error) {
-            console.error("Error saving JSON to server:", error);
-            alert("An error occurred while attempting to save to the server.");
+            console.error("Error saving state to server:", error);
+            alert("An error occurred while saving state to the server.");
         }
     };
 
-    // Load state from server files
     const handleOpenLoadModal = async () => {
         setIsLoadingFiles(true);
         setIsLoadModalOpen(true);
@@ -267,6 +189,7 @@ export default function ProductiveRamadanView() {
         }
     };
 
+    // Load selected JSON file containing student performance & custom verdicts
     const handleLoadSelectedFile = async (fileName: string) => {
         try {
             const response = await fetch(`/api/load-ramadan-data?file=${encodeURIComponent(fileName)}`);
@@ -280,27 +203,27 @@ export default function ProductiveRamadanView() {
 
             if (response.ok && result.success && result.data) {
                 const parsed = result.data;
+                const loadedGroups = parsed.ageGroups || ageGroups;
 
                 if (parsed.students) {
                     const cleanedStudents = parsed.students.map((s: any) => ({
                         ...s,
                         age: typeof s.age === "number" && !isNaN(s.age) ? s.age : null,
-                        ageGroup: determineAgeGroup(s.age),
+                        ageGroup: determineAgeGroup(s.age, loadedGroups),
                     }));
                     setStudents(cleanedStudents);
                 }
-                if (parsed.year) setCompetitionYear(parsed.year);
-                if (parsed.ageGroups) setAgeGroups(parsed.ageGroups);
-                if (parsed.verdictOptions) setVerdictOptions(parsed.verdictOptions);
-                if (typeof parsed.bonusPrizeMoney === "number") setBonusPrizeMoney(parsed.bonusPrizeMoney);
 
-                saveStateToStorage(
-                    parsed.students,
-                    parsed.year,
-                    parsed.ageGroups,
-                    parsed.verdictOptions,
-                    parsed.bonusPrizeMoney
-                );
+                const loadedYear = parsed.year || competitionYear;
+                const loadedVerdicts = parsed.verdictOptions || verdictOptions;
+                const loadedBonus = typeof parsed.bonusPrizeMoney === "number" ? parsed.bonusPrizeMoney : bonusPrizeMoney;
+
+                setCompetitionYear(loadedYear);
+                setAgeGroups(loadedGroups);
+                setVerdictOptions(loadedVerdicts);
+                setBonusPrizeMoney(loadedBonus);
+
+                saveStateToStorage(parsed.students, loadedYear, loadedGroups, loadedVerdicts, loadedBonus);
                 setIsLoadModalOpen(false);
                 alert(`Successfully loaded ${fileName}!`);
             } else {
@@ -311,11 +234,63 @@ export default function ProductiveRamadanView() {
         }
     };
 
-    // Inline Age Editing
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const text = evt.target?.result as string;
+            if (!text) return;
+
+            const lines = text.split(/\r\n|\n/);
+            const parsed: RamadanStudent[] = [];
+
+            lines.forEach((line, idx) => {
+                const trimmed = line.trim();
+                if (!trimmed) return;
+
+                const delimiter = trimmed.includes(";") ? ";" : ",";
+                const cols = trimmed.split(delimiter).map((c) => c.replace(/^["']|["']$/g, "").trim());
+
+                if (
+                    idx === 0 &&
+                    (cols[0].toLowerCase().includes("name") ||
+                        (cols[1] && cols[1].toLowerCase().includes("age")) ||
+                        (cols[2] && cols[2].toLowerCase().includes("gender")))
+                ) {
+                    return;
+                }
+
+                if (cols.length >= 1) {
+                    const name = cols[0];
+                    const rawAgeCol = cols[1] ? cols[1].trim() : "";
+                    const hasDigits = /\d/.test(rawAgeCol);
+                    const age = hasDigits ? parseInt(rawAgeCol.replace(/\D/g, ""), 10) : null;
+                    const gender = cols[2] ? cols[2].trim() : "Unspecified";
+                    const calculatedGroup = determineAgeGroup(age, ageGroups);
+
+                    parsed.push({
+                        id: `std-${Date.now()}-${idx}`,
+                        name,
+                        age,
+                        gender,
+                        ageGroup: calculatedGroup,
+                    });
+                }
+            });
+
+            setStudents(parsed);
+            saveStateToStorage(parsed);
+        };
+
+        reader.readAsText(file);
+    };
+
     const handleSaveStudentAge = (studentId: string) => {
         const parsedAge = parseInt(editingAgeInput, 10);
         const newAge = !isNaN(parsedAge) ? parsedAge : null;
-        const newGroup = determineAgeGroup(newAge);
+        const newGroup = determineAgeGroup(newAge, ageGroups);
 
         const updated = students.map((std) => (std.id === studentId ? { ...std, age: newAge, ageGroup: newGroup } : std));
         setStudents(updated);
@@ -326,12 +301,10 @@ export default function ProductiveRamadanView() {
 
     const getTargetCriteriaForStudent = (student: RamadanStudent) => {
         if (student.ageGroup === "Unassigned") return [];
-        const normalizedStudentGroup = normalizeAgeGroup(student.ageGroup);
-        const matchedGroup = ageGroups.find((g) => normalizeAgeGroup(g.label) === normalizedStudentGroup);
+        const matchedGroup = ageGroups.find((g) => g.label === student.ageGroup);
         return matchedGroup ? matchedGroup.requirements : [];
     };
 
-    // Open Performance Modal
     const handleOpenPerformanceModal = (student: RamadanStudent) => {
         setSelectedStudentForPerformance(student);
         const existing = student.performance;
@@ -369,7 +342,6 @@ export default function ProductiveRamadanView() {
         setSelectedStudentForPerformance(null);
     };
 
-    // Calculate total prize money dynamically
     const calculatePrizeMoney = (performance?: StudentPerformance) => {
         if (!performance || !performance.verdict) return 0;
         const matchedVerdict = verdictOptions.find((v) => v.name === performance.verdict);
@@ -383,8 +355,7 @@ export default function ProductiveRamadanView() {
             const matchesSearch =
                 !searchTerm.trim() || student.name.toLowerCase().includes(searchTerm.toLowerCase().trim());
             const matchesGroup =
-                selectedGroupFilter === "ALL" ||
-                normalizeAgeGroup(student.ageGroup) === normalizeAgeGroup(selectedGroupFilter);
+                selectedGroupFilter === "ALL" || student.ageGroup === selectedGroupFilter;
 
             return matchesSearch && matchesGroup;
         });
@@ -392,7 +363,7 @@ export default function ProductiveRamadanView() {
 
     return (
         <div className="space-y-6">
-            {/* TOP CONTROL PANEL */}
+            {/* TOP BAR CONTROL PANEL */}
             <div className="bg-slate-900 text-white rounded-xl p-5 shadow-lg border border-amber-500/20">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -479,7 +450,7 @@ export default function ProductiveRamadanView() {
                 </div>
             </div>
 
-            {/* FILTER & STATS BAR */}
+            {/* FILTER BAR */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-2xs">
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
@@ -501,7 +472,7 @@ export default function ProductiveRamadanView() {
                         <option value="ALL">All Age Groups</option>
                         {ageGroups.map((group) => (
                             <option key={group.id} value={group.label}>
-                                Group {group.label}
+                                Group {group.code} ({group.label})
                             </option>
                         ))}
                         <option value="Unassigned">Unassigned (Missing Age)</option>
@@ -575,12 +546,11 @@ export default function ProductiveRamadanView() {
                                                 </span>
                                             ) : (
                                                 <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                                                    {std.ageGroup}
+                                                    Group {std.ageGroup}
                                                 </span>
                                             )}
                                         </td>
 
-                                        {/* Verdict Status & Prize Money */}
                                         <td className="p-3.5 font-bold">
                                             {std.performance?.verdict ? (
                                                 <div className="flex items-center gap-1.5">
@@ -606,11 +576,11 @@ export default function ProductiveRamadanView() {
                                                     onClick={() => handleOpenPerformanceModal(std)}
                                                     disabled={isAgeMissing}
                                                     className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded transition-colors ${isAgeMissing
-                                                        ? "bg-gray-100 text-gray-300 border border-gray-200 cursor-not-allowed opacity-60"
-                                                        : "bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold cursor-pointer"
+                                                            ? "bg-gray-100 text-gray-300 border border-gray-200 cursor-not-allowed opacity-60"
+                                                            : "bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold cursor-pointer"
                                                         }`}
                                                 >
-                                                    <Award className="w-3.5 h-3.5 text-amber-600" /> Performances
+                                                    <Award className="w-3.5 h-3.5 text-amber-600" /> Performance
                                                 </button>
 
                                                 {isEditing ? (
@@ -662,7 +632,7 @@ export default function ProductiveRamadanView() {
                                     Age: <strong>{selectedStudentForPerformance.age} yrs</strong> | Group: <strong>{selectedStudentForPerformance.ageGroup}</strong>
                                 </p>
                             </div>
-                            <button onClick={() => setSelectedStudentForPerformance(null)} className="text-gray-400 hover:text-gray-600 text-xs font-bold">
+                            <button onClick={() => setSelectedStudentForPerformance(null)} className="text-gray-400 hover:text-gray-600 text-xs font-bold cursor-pointer">
                                 ✕
                             </button>
                         </div>
@@ -696,7 +666,7 @@ export default function ProductiveRamadanView() {
                             ))}
                         </div>
 
-                        {/* ADDITIONAL CRITERIA */}
+                        {/* ADDITIONAL CHECKBOX ACTIVITIES */}
                         <div className="space-y-3 pt-2 border-t">
                             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Mosque / Ramadan Activities</h4>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -725,7 +695,26 @@ export default function ProductiveRamadanView() {
                             </div>
                         </div>
 
-                        {/* DYNAMIC VERDICTS FROM ADMIN CONFIGURATION */}
+                        {/* USER INPUT FOR CUSTOM TASKS & NOTES */}
+                        <div className="space-y-2 pt-2 border-t">
+                            <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                                <FileText className="w-3.5 h-3.5 text-amber-600" /> Additional Tasks / Notes Input
+                            </label>
+                            <textarea
+                                value={performanceDraft.customCriteria}
+                                onChange={(e) =>
+                                    setPerformanceDraft((prev) => ({
+                                        ...prev,
+                                        customCriteria: e.target.value,
+                                    }))
+                                }
+                                placeholder="Enter extra achievements, extra Surahs memorized, or notes for this student..."
+                                rows={3}
+                                className="w-full text-xs p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-emerald-600 focus:outline-none"
+                            />
+                        </div>
+
+                        {/* DYNAMIC VERDICTS */}
                         <div className="space-y-3 pt-2 border-t bg-amber-50/50 p-3.5 rounded-xl border border-amber-200">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div>
@@ -760,10 +749,10 @@ export default function ProductiveRamadanView() {
                         </div>
 
                         <div className="flex items-center justify-end gap-2 pt-2 border-t">
-                            <button onClick={() => setSelectedStudentForPerformance(null)} className="px-4 py-2 text-xs text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <button onClick={() => setSelectedStudentForPerformance(null)} className="px-4 py-2 text-xs text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer">
                                 Cancel
                             </button>
-                            <button onClick={handleSavePerformance} className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-600 rounded-lg shadow-xs">
+                            <button onClick={handleSavePerformance} className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-600 rounded-lg shadow-xs cursor-pointer">
                                 Save Performance
                             </button>
                         </div>
@@ -771,7 +760,49 @@ export default function ProductiveRamadanView() {
                 </div>
             )}
 
-            {/* ENHANCED ADMIN PANEL MODAL */}
+            {/* SERVER FILE SELECTION MODAL */}
+            {isLoadModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-xl border border-gray-200 max-w-md w-full p-5 space-y-4">
+                        <div className="flex items-center justify-between border-b pb-3">
+                            <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                                <FolderOpen className="w-4 h-4 text-amber-500" /> Select Saved Server File
+                            </h3>
+                            <button
+                                onClick={() => setIsLoadModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 text-xs font-bold cursor-pointer"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {isLoadingFiles ? (
+                            <div className="py-8 text-center text-xs text-gray-500">Loading available files...</div>
+                        ) : availableFiles.length === 0 ? (
+                            <div className="py-8 text-center text-xs text-gray-400">No saved JSON files found on server.</div>
+                        ) : (
+                            <div className="max-h-60 overflow-y-auto space-y-2">
+                                {availableFiles.map((file) => (
+                                    <button
+                                        key={file.fileName}
+                                        onClick={() => handleLoadSelectedFile(file.fileName)}
+                                        className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-amber-500 hover:bg-amber-50/50 transition-all flex flex-col gap-1 cursor-pointer group"
+                                    >
+                                        <span className="text-xs font-bold text-gray-800 group-hover:text-amber-900">
+                                            {file.fileName}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400">
+                                            Modified: {new Date(file.updatedAt).toLocaleString()}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ADMIN PANEL MODAL */}
             {isAdminOpen && (
                 <RamadanAdminModal
                     isOpen={isAdminOpen}
@@ -792,7 +823,7 @@ export default function ProductiveRamadanView() {
     );
 }
 
-// INLINE ADMIN MODAL COMPONENT SUPPORTING CRUD FOR VERDICTS & PRIZE MONEY
+// ADMIN PANEL MODAL
 function RamadanAdminModal({
     isOpen,
     onClose,
@@ -809,17 +840,27 @@ function RamadanAdminModal({
     onSave: (groups: RamadanAgeGroup[], verdicts: VerdictOption[], bonus: number) => void;
 }) {
     const [activeTab, setActiveTab] = useState<"criteria" | "verdicts">("verdicts");
-    const [groupsState, setGroupsState] = useState<RamadanAgeGroup[]>(ageGroups);
+
     const [verdictsState, setVerdictsState] = useState<VerdictOption[]>(verdictOptions);
     const [bonusState, setBonusState] = useState<number>(bonusPrizeMoney);
+    const [rawRequirements, setRawRequirements] = useState<Record<string, string>>({});
 
-    // New Verdict Form State
+    useEffect(() => {
+        setVerdictsState(verdictOptions);
+        setBonusState(bonusPrizeMoney);
+
+        const map: Record<string, string> = {};
+        ageGroups.forEach((g) => {
+            map[g.id] = g.requirements.join("\n");
+        });
+        setRawRequirements(map);
+    }, [isOpen, ageGroups, verdictOptions, bonusPrizeMoney]);
+
     const [newVerdictName, setNewVerdictName] = useState("");
     const [newVerdictPrize, setNewVerdictPrize] = useState(10);
 
     if (!isOpen) return null;
 
-    // Verdict CRUD Operations
     const handleAddVerdict = () => {
         if (!newVerdictName.trim()) return;
         const newVerdict: VerdictOption = {
@@ -827,21 +868,40 @@ function RamadanAdminModal({
             name: newVerdictName.trim(),
             prizeMoney: Math.max(0, newVerdictPrize),
         };
-        setVerdictsState([...verdictsState, newVerdict]);
+        setVerdictsState((prev) => [...prev, newVerdict]);
         setNewVerdictName("");
         setNewVerdictPrize(10);
     };
 
     const handleUpdateVerdict = (id: string, field: "name" | "prizeMoney", value: any) => {
-        setVerdictsState(
-            verdictsState.map((v) =>
-                v.id === id ? { ...v, [field]: field === "prizeMoney" ? parseInt(value, 10) || 0 : value } : v
+        setVerdictsState((prev) =>
+            prev.map((v) =>
+                v.id === id
+                    ? { ...v, [field]: field === "prizeMoney" ? parseInt(value, 10) || 0 : value }
+                    : v
             )
         );
     };
 
     const handleDeleteVerdict = (id: string) => {
-        setVerdictsState(verdictsState.filter((v) => v.id !== id));
+        setVerdictsState((prev) => prev.filter((v) => v.id !== id));
+    };
+
+    const handleSaveAll = () => {
+        const updatedAgeGroups = ageGroups.map((group) => {
+            const rawText = rawRequirements[group.id] || "";
+            const cleanReqs = rawText
+                .split("\n")
+                .map((line) => line.trim())
+                .filter((line) => line.length > 0);
+
+            return {
+                ...group,
+                requirements: cleanReqs,
+            };
+        });
+
+        onSave(updatedAgeGroups, verdictsState, bonusState);
     };
 
     return (
@@ -851,18 +911,17 @@ function RamadanAdminModal({
                     <h3 className="font-bold text-gray-900 text-base flex items-center gap-2">
                         <Settings className="w-5 h-5 text-amber-500" /> Ramadan Competition Settings
                     </h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xs font-bold">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xs font-bold cursor-pointer">
                         ✕
                     </button>
                 </div>
 
-                {/* TAB SWITCHER */}
                 <div className="flex items-center gap-2 border-b">
                     <button
                         onClick={() => setActiveTab("verdicts")}
                         className={`pb-2 text-xs font-bold border-b-2 transition-colors cursor-pointer ${activeTab === "verdicts"
-                            ? "border-amber-500 text-amber-900"
-                            : "border-transparent text-gray-400 hover:text-gray-600"
+                                ? "border-amber-500 text-amber-900"
+                                : "border-transparent text-gray-400 hover:text-gray-600"
                             }`}
                     >
                         Verdicts & Prize Money
@@ -870,18 +929,16 @@ function RamadanAdminModal({
                     <button
                         onClick={() => setActiveTab("criteria")}
                         className={`pb-2 text-xs font-bold border-b-2 transition-colors cursor-pointer ${activeTab === "criteria"
-                            ? "border-amber-500 text-amber-900"
-                            : "border-transparent text-gray-400 hover:text-gray-600"
+                                ? "border-amber-500 text-amber-900"
+                                : "border-transparent text-gray-400 hover:text-gray-600"
                             }`}
                     >
                         Age Group Target Criteria
                     </button>
                 </div>
 
-                {/* VERDICTS & PRIZE MONEY SECTION */}
                 {activeTab === "verdicts" && (
                     <div className="space-y-5">
-                        {/* BONUS PRIZE MONEY FIELD */}
                         <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-xl flex items-center justify-between gap-4">
                             <div>
                                 <label className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
@@ -900,7 +957,6 @@ function RamadanAdminModal({
                             />
                         </div>
 
-                        {/* VERDICT CRUD TABLE */}
                         <div className="space-y-3">
                             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                                 Result Categories (Verdict Levels)
@@ -939,11 +995,10 @@ function RamadanAdminModal({
                                 ))}
                             </div>
 
-                            {/* ADD NEW VERDICT */}
                             <div className="pt-2 flex items-center gap-2">
                                 <input
                                     type="text"
-                                    placeholder="New Verdict Name (e.g., Master)"
+                                    placeholder="New Verdict Name (e.g., Honor Roll)"
                                     value={newVerdictName}
                                     onChange={(e) => setNewVerdictName(e.target.value)}
                                     className="flex-1 text-xs px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none"
@@ -969,35 +1024,29 @@ function RamadanAdminModal({
                     </div>
                 )}
 
-                {/* AGE GROUP TARGET CRITERIA TAB */}
                 {activeTab === "criteria" && (
                     <div className="space-y-4 max-h-96 overflow-y-auto">
-                        {/* HELPER PROMPT MESSAGE */}
                         <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
                             <p className="font-bold mb-0.5">💡 How to enter criteria:</p>
                             <p>
-                                Enter each rule or target criterion on a <strong>new line</strong>.
-                                Blank lines will be automatically removed when saving.
+                                Enter each rule or target criterion on a <strong>new line</strong> (press Enter).
+                                Blank lines will automatically be cleaned up when saving configuration.
                             </p>
                         </div>
 
-                        {groupsState.map((group) => (
+                        {ageGroups.map((group) => (
                             <div key={group.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
-                                <span className="text-xs font-bold text-gray-800">Age Group: {group.label}</span>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-gray-800">Group {group.code} ({group.label})</span>
+                                    <span className="text-[10px] text-gray-500 font-medium">Ages: {group.ageMin} - {group.ageMax}</span>
+                                </div>
                                 <textarea
-                                    value={group.requirements.join("\n")}
+                                    value={rawRequirements[group.id] ?? ""}
                                     onChange={(e) => {
-                                        // Split by newline and filter out blank lines
-                                        const reqs = e.target.value
-                                            .split("\n")
-                                            .map((line) => line.trim())
-                                            .filter((line) => line.length > 0);
-
-                                        setGroupsState(
-                                            groupsState.map((g) => (g.id === group.id ? { ...g, requirements: reqs } : g))
-                                        );
+                                        const val = e.target.value;
+                                        setRawRequirements((prev) => ({ ...prev, [group.id]: val }));
                                     }}
-                                    placeholder="e.g. Read 5 pages of Quran daily&#10;Fast at least 15 days&#10;Attend Friday prayers"
+                                    placeholder={"Read 5 pages of Quran daily\nFast at least 15 days"}
                                     rows={4}
                                     className="w-full text-xs p-2.5 border border-gray-300 rounded bg-white focus:ring-1 focus:ring-emerald-600 focus:outline-none"
                                 />
@@ -1007,12 +1056,12 @@ function RamadanAdminModal({
                 )}
 
                 <div className="flex items-center justify-end gap-2 pt-3 border-t">
-                    <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <button onClick={onClose} className="px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg cursor-pointer">
                         Cancel
                     </button>
                     <button
-                        onClick={() => onSave(groupsState, verdictsState, bonusState)}
-                        className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-600 rounded-lg shadow-xs"
+                        onClick={handleSaveAll}
+                        className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-600 rounded-lg shadow-xs cursor-pointer"
                     >
                         Save Configuration
                     </button>

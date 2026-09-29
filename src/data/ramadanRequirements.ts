@@ -98,3 +98,15 @@ export interface RamadanStudent {
     ageGroup: "< 7" | "7 - 8" | "9 - 10" | "11 - 13" | "> 13" | "Unassigned";
     performance?: StudentPerformance;
 }
+
+export interface VerdictOption {
+    id: string;
+    name: string;
+    prizeMoney: number;
+}
+
+export const DEFAULT_VERDICT_OPTIONS: VerdictOption[] = [
+    { id: "verdict-1", name: "Entry", prizeMoney: 15 },
+    { id: "verdict-2", name: "Basic", prizeMoney: 25 },
+    { id: "verdict-3", name: "Advanced", prizeMoney: 35 },
+];
