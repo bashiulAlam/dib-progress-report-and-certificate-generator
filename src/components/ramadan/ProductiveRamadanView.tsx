@@ -16,6 +16,7 @@ import {
     Plus,
     Trash2,
     FileText,
+    Printer,
 } from "lucide-react";
 import {
     DEFAULT_RAMADAN_AGE_GROUPS,
@@ -23,6 +24,8 @@ import {
     RamadanAgeGroup,
     VerdictOption,
 } from "../../data/ramadanRequirements";
+import RamadanReportBulkPrintModal from "./RamadanReportBulkPrintModal";
+import { RamadanPerformanceData } from "./RamadanReportCard";
 
 export interface StudentPerformance {
     targetCriteria: Record<string, "fully" | "partially" | "not_achieved">;
@@ -65,6 +68,7 @@ export default function ProductiveRamadanView() {
     const [bonusPrizeMoney, setBonusPrizeMoney] = useState<number>(5);
 
     const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
+    const [isPrintModalOpen, setIsPrintModalOpen] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedGroupFilter, setSelectedGroupFilter] = useState<string>("ALL");
 
@@ -361,6 +365,57 @@ export default function ProductiveRamadanView() {
         });
     }, [students, searchTerm, selectedGroupFilter]);
 
+    // Format students with valid performances for PDF Report Cards
+    const participantsWithPerformance = useMemo<RamadanPerformanceData[]>(() => {
+        return students
+            .filter((std) => std.performance && std.performance.verdict)
+            .map((std) => {
+                const perf = std.performance!;
+
+                // 1. Target criteria ratings
+                const targetRules = Object.entries(perf.targetCriteria || {}).map(([rule, rating]) => {
+                    const statusLabel =
+                        rating === "fully"
+                            ? "Vollständig erreicht"
+                            : rating === "partially"
+                                ? "Teilweise erreicht"
+                                : "Nicht erreicht";
+                    return { criterion: rule, result: statusLabel };
+                });
+
+                // 2. Default checkbox activities
+                const extraActivitiesList: string[] = [];
+                if (perf.additionalCriteria?.quranLesen) extraActivitiesList.push("Vollständiges Qur'an lesen");
+                if (perf.additionalCriteria?.alleTageFasten) extraActivitiesList.push("Alle Tage Fasten");
+                if (perf.additionalCriteria?.tahajjud) extraActivitiesList.push("Tahajjud Gebete");
+                if (perf.additionalCriteria?.taraweeh) extraActivitiesList.push("Taraweeh Gebete");
+                if (perf.additionalCriteria?.uebernachtungMoschee) extraActivitiesList.push("Übernachtung in der Moschee");
+
+                // 3. Process custom multiline entries (Convert newlines -> Array items)
+                const customTasksList = (perf.customCriteria || "")
+                    .split("\n")
+                    .map((line) => line.trim())
+                    .filter((line) => line.length > 0);
+
+                // 4. Combine both lists cleanly with comma separators (NO brackets)
+                const allTasksCombined = [...extraActivitiesList, ...customTasksList];
+                const formattedAdditionalTasks = allTasksCombined.length > 0 ? allTasksCombined.join(", ") : undefined;
+
+                const prize = calculatePrizeMoney(perf);
+
+                return {
+                    studentId: std.id,
+                    studentName: std.name,
+                    ageGroup: std.ageGroup !== "Unassigned" ? `Gruppe ${std.ageGroup}` : "Altersgruppe k.A.",
+                    verdict: perf.verdict!,
+                    criteriaResults: targetRules,
+                    additionalTasks: formattedAdditionalTasks, // Clean, comma-separated string
+                    bonusAmount: perf.bonusPoints ? `+${bonusPrizeMoney} € (Sonderbonus)` : undefined,
+                    prizeMoney: `${prize},00 €`,
+                };
+            });
+    }, [students, verdictOptions, bonusPrizeMoney]);
+
     return (
         <div className="space-y-6">
             {/* TOP BAR CONTROL PANEL */}
@@ -420,6 +475,14 @@ export default function ProductiveRamadanView() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                            onClick={() => setIsPrintModalOpen(true)}
+                            disabled={participantsWithPerformance.length === 0}
+                            className="bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-slate-950 font-extrabold text-xs px-3.5 py-2 rounded-lg flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                        >
+                            <Printer className="w-4 h-4" /> Berichte drucken ({participantsWithPerformance.length})
+                        </button>
+
                         <label className="cursor-pointer bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-3.5 py-2 rounded-lg font-medium flex items-center gap-1.5 transition-colors shadow-xs">
                             <Upload className="w-4 h-4" /> Import CSV/XLSX
                             <input type="file" accept=".csv,.txt" onChange={handleFileUpload} className="hidden" />
@@ -442,9 +505,9 @@ export default function ProductiveRamadanView() {
 
                         <button
                             onClick={() => setIsAdminOpen(true)}
-                            className="bg-amber-600 hover:bg-amber-500 text-white text-xs px-3.5 py-2 rounded-lg font-bold flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                            className="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3.5 py-2 rounded-lg font-bold border border-gray-700 flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                         >
-                            <Settings className="w-4 h-4" /> Admin Panel
+                            <Settings className="w-4 h-4 text-amber-400" /> Admin Panel
                         </button>
                     </div>
                 </div>
@@ -576,8 +639,8 @@ export default function ProductiveRamadanView() {
                                                     onClick={() => handleOpenPerformanceModal(std)}
                                                     disabled={isAgeMissing}
                                                     className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded transition-colors ${isAgeMissing
-                                                            ? "bg-gray-100 text-gray-300 border border-gray-200 cursor-not-allowed opacity-60"
-                                                            : "bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold cursor-pointer"
+                                                        ? "bg-gray-100 text-gray-300 border border-gray-200 cursor-not-allowed opacity-60"
+                                                        : "bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold cursor-pointer"
                                                         }`}
                                                 >
                                                     <Award className="w-3.5 h-3.5 text-amber-600" /> Performance
@@ -697,8 +760,13 @@ export default function ProductiveRamadanView() {
 
                         {/* USER INPUT FOR CUSTOM TASKS & NOTES */}
                         <div className="space-y-2 pt-2 border-t">
-                            <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                                <FileText className="w-3.5 h-3.5 text-amber-600" /> Additional Tasks / Notes Input
+                            <label className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                                <span className="flex items-center gap-1.5">
+                                    <FileText className="w-3.5 h-3.5 text-amber-600" /> Additional Tasks / Notes Input
+                                </span>
+                                <span className="text-[10px] font-normal text-gray-500">
+                                    (One task per line - converted to comma separated on report)
+                                </span>
                             </label>
                             <textarea
                                 value={performanceDraft.customCriteria}
@@ -708,7 +776,7 @@ export default function ProductiveRamadanView() {
                                         customCriteria: e.target.value,
                                     }))
                                 }
-                                placeholder="Enter extra achievements, extra Surahs memorized, or notes for this student..."
+                                placeholder={`did one thing\ndid 2 things\ndid lots of good deeds`}
                                 rows={3}
                                 className="w-full text-xs p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-emerald-600 focus:outline-none"
                             />
@@ -800,6 +868,15 @@ export default function ProductiveRamadanView() {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* RAMADAN REPORT BULK PRINT MODAL */}
+            {isPrintModalOpen && (
+                <RamadanReportBulkPrintModal
+                    isOpen={isPrintModalOpen}
+                    onClose={() => setIsPrintModalOpen(false)}
+                    studentsData={participantsWithPerformance}
+                />
             )}
 
             {/* ADMIN PANEL MODAL */}
@@ -920,8 +997,8 @@ function RamadanAdminModal({
                     <button
                         onClick={() => setActiveTab("verdicts")}
                         className={`pb-2 text-xs font-bold border-b-2 transition-colors cursor-pointer ${activeTab === "verdicts"
-                                ? "border-amber-500 text-amber-900"
-                                : "border-transparent text-gray-400 hover:text-gray-600"
+                            ? "border-amber-500 text-amber-900"
+                            : "border-transparent text-gray-400 hover:text-gray-600"
                             }`}
                     >
                         Verdicts & Prize Money
@@ -929,8 +1006,8 @@ function RamadanAdminModal({
                     <button
                         onClick={() => setActiveTab("criteria")}
                         className={`pb-2 text-xs font-bold border-b-2 transition-colors cursor-pointer ${activeTab === "criteria"
-                                ? "border-amber-500 text-amber-900"
-                                : "border-transparent text-gray-400 hover:text-gray-600"
+                            ? "border-amber-500 text-amber-900"
+                            : "border-transparent text-gray-400 hover:text-gray-600"
                             }`}
                     >
                         Age Group Target Criteria
