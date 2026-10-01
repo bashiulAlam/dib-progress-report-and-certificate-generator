@@ -70,8 +70,59 @@ Recommended approach:
 - keep opacity around 0.04–0.08 when printed
 - avoid high contrast filters that make the watermark too visible
 
+## Ramadan Report Design
+
+The Ramadan competition report uses a complementary professional style:
+
+**Language & Script:**
+- Primary text in German
+- Arabic Qur'anic elements (Basmalah in original Arabic script)
+- German translations provided for Arabic text
+
+**Color Palette:**
+- Dark emerald green (#005C3C) for headings and table borders
+- Gold/amber (#E1A929) for secondary emphasis
+- White paper background with subtle borders
+- Neutral grays for secondary content
+- Green highlight for prize award section
+
+**Typography:**
+- Serif fonts for formal title and certificate feel
+- Sans-serif for metadata and table content
+- Bold weights for verdict/achievement labels
+
+**Structure:**
+- Header with academy branding and Arabic/German bilingual greeting
+- Clear student identity section
+- Criteria evaluation table with color-coded results
+- Prominent prize money award display
+- Motivational spiritual content section
+- Professional signature area
+
+**Key Design Elements:**
+1. **Basmalah Display** — Arabic text rendered in original script with German translation
+2. **Achievement Rating Labels** — Consistent German terminology:
+   - "Vollständig erreicht" (Fully achieved)
+   - "Teilweise erreicht" (Partially achieved)
+   - "Nicht erreicht" (Not achieved)
+3. **Year Display** — Shows both Gregorian and Hijri calendars
+4. **Watermark** — Faint academy logo background
+5. **Certificate Aesthetic** — Professional award-style layout
+
+**Print Considerations:**
+- Optimized for A4 portrait format
+- Color-safe design (prints well in B&W and color)
+- Page breaks handled automatically in bulk mode
+- Watermark visibility preserved in PDF export
+
 ## Important Files
 
+### Academic Reports
 - `src/components/StudentReportCard.tsx` — report layout and visual styling
 - `src/app/globals.css` — print-specific CSS rules and layout behavior
 - `src/components/CornerOrnament.tsx` — decorative border design
+
+### Ramadan Reports
+- `src/components/ramadan/RamadanReportCard.tsx` — Ramadan certificate design and layout
+- `src/components/ramadan/RamadanReportBulkPrintModal.tsx` — bulk print flow UI
+- `src/data/ramadanDateUtils.ts` — year conversion and formatting utilities

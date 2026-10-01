@@ -283,3 +283,82 @@ bg-[#005C3C]/10    /* Green tint */
 - This approach works across all browsers and devices
 - Users have full control over print settings and device
 - Export is instantaneous (no server processing)
+
+## Ramadan Bulk Print Workflow
+
+**Similar pattern to academic bulk print, with adaptations:**
+
+1. User clicks "Bulk Print" in Ramadan view
+2. Modal opens showing:
+   - Issue date input (defaults to today in German format)
+   - Issue place input (defaults to "Berlin")
+   - Progress bar with stages
+3. User clicks "Generate & Print"
+4. Three-stage progress display:
+   - Stage 1 (20%): Filter students with verdicts, prepare data
+   - Stage 2 (60%): Wait for React render and browser paint
+   - Stage 3 (100%): Trigger print dialog
+5. All report cards render to portal in document.body
+6. `window.print()` called, showing multi-page preview
+7. User prints to printer or saves as PDF
+8. Modal remains open until user closes manually
+
+**Key Differences from Academic Bulk Print:**
+
+- Filters by `verdict` (only includes evaluated students)
+- Generates `RamadanPerformanceData` instead of academic scores
+- Includes Hijri year in report header
+- German language throughout
+- One report per page with automatic page breaks
+- Prize money and achievement levels displayed
+
+**Multi-frame Delay Implementation:**
+```ts
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      setProgress(100);
+      window.print();
+      setIsProcessing(false);
+    }, 400);
+  });
+});
+```
+
+**Rationale:**
+- Frame 1: React reconciliation (setState → component update)
+- Frame 2: Browser paint (DOM changes → pixels)
+- setTimeout: Async resource loading (images, fonts)
+- Then: `window.print()` ensures all content rendered
+
+**Portal Setup for Ramadan:**
+```jsx
+{createPortal(
+  <div className="hidden print:block">
+    <style>{`
+      @media print {
+        .break-after-page {
+          page-break-after: always;
+          break-after: page;
+        }
+      }
+    `}</style>
+    {printableStudents.map((studentData) => (
+      <div key={studentData.studentId} className="break-after-page">
+        <RamadanReportCard
+          data={studentData}
+          issueDate={issueDate}
+          issuePlace={issuePlace}
+          address={address}
+          competitionYear={competitionYear}
+        />
+      </div>
+    ))}
+  </div>,
+  document.body
+)}
+```
+
+**File References:**
+- [RamadanReportBulkPrintModal.tsx](../../src/components/ramadan/RamadanReportBulkPrintModal.tsx) — bulk workflow
+- [RamadanReportCard.tsx](../../src/components/ramadan/RamadanReportCard.tsx) — report template
