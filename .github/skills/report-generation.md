@@ -1,6 +1,10 @@
 # Report Generation
 
-## High-Level Flow
+## Two Report Systems
+
+### 1. Academic Progress Reports
+
+#### High-Level Flow
 
 ```
 User clicks eye icon (preview student)
@@ -28,7 +32,7 @@ User saves as PDF or prints to paper
 
 ## Component Structure
 
-### StudentReportCard.tsx
+### StudentReportCard.tsx (Academic)
 
 **Entry point:** Single component handles both single-student and bulk modes.
 
@@ -306,9 +310,253 @@ Renders:
 5. Total row: 170 / 200
 6. Signatures section
 
+### 2. Ramadan Competition Reports
+
+#### High-Level Flow
+
+```
+Admin clicks "Bulk Print" button in Ramadan view
+        ↓
+RamadanReportBulkPrintModal opens
+        ↓
+User enters issue date and place
+        ↓
+Clicks "Generate & Print"
+        ↓
+App filters students with assigned verdicts
+        ↓
+Generates RamadanPerformanceData for each
+        ↓
+Prepares progress updates (Stage 1: 20%)
+        ↓
+Requests animation frame for portal render (Stage 2: 60%)
+        ↓
+Renders all reports to document.body portal
+        ↓
+Triggers window.print() (Stage 3: 100%)
+        ↓
+Browser print dialog shows multi-page preview
+        ↓
+User prints to paper or saves as PDF
+```
+
+#### Component: RamadanReportCard.tsx
+
+**Entry point:** Print-friendly certificate for Ramadan competition participants.
+
+**Props:**
+```typescript
+{
+  data: RamadanPerformanceData;
+  issueDate: string;         // e.g., "15.03.2026"
+  issuePlace?: string;       // e.g., "Berlin"
+  address?: string;          // Academy address
+  competitionYear?: number;  // e.g., 2026
+}
+```
+
+**Data Input Structure:**
+```ts
+interface RamadanPerformanceData {
+  studentId: string;
+  studentName: string;
+  ageGroup: string;  // e.g., "7 - 8"
+  verdict: string;   // e.g., "Basic"
+  criteriaResults: Array<{
+    criterion: string;
+    result: string;  // "Vollständig erreicht", "Teilweise erreicht", "Nicht erreicht"
+  }>;
+  additionalTasks?: string;    // comma-separated, e.g., "Taraweeh, Tahajjud"
+  bonusAmount?: string | number;
+  prizeMoney: string;  // e.g., "25,00 €"
+}
+```
+
+**Report Structure:**
+
+1. **Header Section**
+   - Academy logo (top-right)
+   - Academy name and branding
+   - Arabic Basmalah (بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ)
+   - German translation of Basmalah
+   - Report title: "Der produktive Ramadan der Kinder"
+   - Year badge showing both CE and AH years
+
+2. **Student Identity Block**
+   - DIN 5008 compliant address-style box
+   - Student name (prominent)
+   - Age group label
+   - Final verdict/classification
+
+3. **Criteria Evaluation Table**
+   - Target criteria column (from age group requirements)
+   - Achievement level column (fully/partially/not achieved)
+   - Additional activities row
+   - Custom tasks/notes row
+   - Conditional bonus row
+
+4. **Prize Award Section**
+   - Highlighted in emerald green
+   - Base prize money + bonus (if applicable)
+   - Clear monetary value display
+
+5. **Spiritual Content**
+   - Qur'anic verse (Arabic + German translation)
+   - Motivational message in German
+   - Encouragement for continued effort
+
+6. **Footer**
+   - Issue date and place
+   - Signature line for school principal
+   - Academy name and authority
+
+#### Data Generation Flow
+
+**In ProductiveRamadanView.tsx:**
+```ts
+// Filter students with verdicts
+const participantsWithPerformance = useMemo<RamadanPerformanceData[]>(() => {
+  return students
+    .filter((std) => std.performance && std.performance.verdict)
+    .map((std) => {
+      const perf = std.performance!;
+      
+      // Extract target criteria results
+      const targetRules = Object.entries(perf.targetCriteria).map(([rule, rating]) => ({
+        criterion: rule,
+        result: getRatingLabel(rating)  // "Vollständig erreicht" etc.
+      }));
+      
+      // Filter additional activities based on config
+      const extraActivities = additionalCriteriaConfig
+        .filter((item) => perf.additionalCriteria[item.id])
+        .map((item) => item.label);
+      
+      // Parse custom tasks (one per line -> comma-separated)
+      const customTasks = (perf.customCriteria || "")
+        .split("\n")
+        .filter((line) => line.trim());
+      
+      // Combine all tasks
+      const allTasks = [...extraActivities, ...customTasks];
+      
+      // Calculate prize
+      const verdict = verdictOptions.find((v) => v.name === perf.verdict);
+      const basePrize = verdict?.prizeMoney || 0;
+      const bonusAmount = perf.bonusPoints ? bonusPrizeMoney : 0;
+      const totalPrize = basePrize + bonusAmount;
+      
+      return {
+        studentId: std.id,
+        studentName: std.name,
+        ageGroup: std.ageGroup,
+        verdict: perf.verdict,
+        criteriaResults: targetRules,
+        additionalTasks: allTasks.length > 0 ? allTasks.join(", ") : undefined,
+        bonusAmount: perf.bonusPoints ? `+${bonusPrizeMoney} €` : undefined,
+        prizeMoney: `${totalPrize},00 €`
+      };
+    });
+}, [students, verdictOptions, bonusPrizeMoney, additionalCriteriaConfig]);
+```
+
+#### Bulk Print Modal Flow
+
+**In RamadanReportBulkPrintModal.tsx:**
+```ts
+const handleGenerateAndPrint = async () => {
+  setIsProcessing(true);
+  setProgress(20);
+  setStatusMessage("Preparing students...");
+  
+  // Stage 1: Filter and prepare data
+  const filtered = studentsData.filter(/* ... */);
+  setPrintableStudents(filtered);
+  
+  setProgress(60);
+  setStatusMessage("Formatting reports...");
+  
+  // Stage 2: Wait for React render + browser paint
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setProgress(100);
+        
+        // Stage 3: Open print dialog
+        window.print();
+        setIsProcessing(false);
+        // Modal stays open until user closes
+      }, 400);
+    });
+  });
+};
+```
+
+**Portal structure:**
+```jsx
+{createPortal(
+  <div className="hidden print:block">
+    <style>{`
+      @media print {
+        .break-after-page {
+          page-break-after: always;
+          break-after: page;
+        }
+      }
+    `}</style>
+    {printableStudents.map((studentData) => (
+      <div key={studentData.studentId} className="break-after-page">
+        <RamadanReportCard
+          data={studentData}
+          issueDate={issueDate}
+          issuePlace={issuePlace}
+          address={address}
+          competitionYear={competitionYear}
+        />
+      </div>
+    ))}
+  </div>,
+  document.body
+)}
+```
+
+#### Hijri Year Conversion
+
+**Utility function in src/data/ramadanDateUtils.ts:**
+```ts
+export const getHijriYear = (gregorianYear: number): string => {
+  try {
+    // Use native Intl API with islamic-umalqura calendar
+    const sampleDate = new Date(gregorianYear, 2, 15);  // March 15
+    const formatter = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura", {
+      year: "numeric",
+    });
+    const parts = formatter.formatToParts(sampleDate);
+    const hijriPart = parts.find((p) => p.type === "year");
+    return hijriPart ? hijriPart.value.replace(/\D/g, "") : "";
+  } catch {
+    // Fallback to basic islamic calendar if umalqura not available
+    return "";
+  }
+};
+```
+
+**Hijri year displayed as:**
+```
+2026 CE • 1447 AH
+```
+
 ## Files & Line References
 
+### Academic Reports
 - [StudentReportCard.tsx](../../src/components/StudentReportCard.tsx#L1) — Main component
+- [BulkPrintModal.tsx](../../src/components/BulkPrintModal.tsx#L1) — Bulk print workflow
+
+### Ramadan Reports
+- [RamadanReportCard.tsx](../../src/components/ramadan/RamadanReportCard.tsx#L1) — Report template
+- [RamadanReportBulkPrintModal.tsx](../../src/components/ramadan/RamadanReportBulkPrintModal.tsx#L1) — Bulk print modal
+- [ProductiveRamadanView.tsx](../../src/components/ramadan/ProductiveRamadanView.tsx#L1) — Main workflow
+- [ramadanDateUtils.ts](../../src/data/ramadanDateUtils.ts#L1) — Year conversion
 - [ReportCardContent](../../src/components/StudentReportCard.tsx#L27) — Content renderer
 - [globals.css](../../src/app/globals.css#L38) — Print media rules
 - [BulkPrintModal.tsx](../../src/components/BulkPrintModal.tsx#L1) — Bulk orchestration

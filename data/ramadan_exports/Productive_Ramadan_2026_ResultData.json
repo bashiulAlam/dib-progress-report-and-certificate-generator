@@ -1,0 +1,695 @@
+{
+  "year": 2026,
+  "ageGroups": [
+    {
+      "id": "group-a",
+      "code": "A",
+      "label": "< 7",
+      "ageMin": 0,
+      "ageMax": 6,
+      "requirements": [
+        "Basierend auf dem bereitgestellten Ramadan-Aktivitätenbuch"
+      ]
+    },
+    {
+      "id": "group-b",
+      "code": "B",
+      "label": "7 - 8",
+      "ageMin": 7,
+      "ageMax": 8,
+      "requirements": [
+        "5 tägliche Gebete",
+        "Auswendiglernen: Sura Al-Fatihah, Sura Nas bis Sura Al-Fil (im Amparabuch)",
+        "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen",
+        "Mindestens 3 Tage fasten"
+      ]
+    },
+    {
+      "id": "group-c",
+      "code": "C",
+      "label": "9 - 10",
+      "ageMin": 9,
+      "ageMax": 10,
+      "requirements": [
+        "5 tägliche Gebete",
+        "Koranrezitation: mindestens 15 Juz",
+        "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar",
+        "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen",
+        "Mindestens 10 Tage fasten"
+      ]
+    },
+    {
+      "id": "group-d",
+      "code": "D",
+      "label": "11 - 13",
+      "ageMin": 11,
+      "ageMax": 13,
+      "requirements": [
+        "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete",
+        "Vollständige Rezitation des Korans (30 Juz)",
+        "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah",
+        "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen",
+        "Mindestens 20 Tage fasten"
+      ]
+    },
+    {
+      "id": "group-e",
+      "code": "E",
+      "label": "13+",
+      "ageMin": 13,
+      "ageMax": 15,
+      "requirements": [
+        "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete",
+        "Mindestens 2 Rak'a Tahajjud verrichten in einem der letzten 10 Tage des Ramadan",
+        "Vollständige Rezitation des Korans (30 Juz)",
+        "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah, die ersten 10 Verse der Sura Al-Mulk",
+        "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen",
+        "Fasten alle Fastentage"
+      ]
+    }
+  ],
+  "verdictOptions": [
+    {
+      "id": "verdict-1",
+      "name": "Entry",
+      "prizeMoney": 15
+    },
+    {
+      "id": "verdict-2",
+      "name": "Basic",
+      "prizeMoney": 25
+    },
+    {
+      "id": "verdict-3",
+      "name": "Advanced",
+      "prizeMoney": 35
+    }
+  ],
+  "bonusPrizeMoney": 5,
+  "students": [
+    {
+      "id": "std-1790712190242-1",
+      "name": "Faiyaz Karim",
+      "age": 9,
+      "gender": "M",
+      "ageGroup": "9 - 10",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete": "fully",
+          "Koranrezitation: mindestens 15 Juz": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 10 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": true
+        },
+        "customCriteria": "Hat seinen Bruder geholfen",
+        "verdict": "Basic",
+        "bonusPoints": true
+      }
+    },
+    {
+      "id": "std-1790712190242-2",
+      "name": "Mohammed Hallak",
+      "age": 12,
+      "gender": "M",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": true,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false,
+          "sadakah": false
+        },
+        "customCriteria": "",
+        "verdict": "Advanced",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-3",
+      "name": "Taif Ahsan",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete": "fully",
+          "Auswendiglernen: Sura Al-Fatihah, Sura Nas bis Sura Al-Fil (im Amparabuch)": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 3 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": true,
+          "sadakah": false
+        },
+        "customCriteria": "",
+        "verdict": "Basic",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-4",
+      "name": "Araf Hussain Akil",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete": "fully",
+          "Auswendiglernen: Sura Al-Fatihah, Sura Nas bis Sura Al-Fil (im Amparabuch)": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 3 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false,
+          "sadakah": true
+        },
+        "customCriteria": "",
+        "verdict": "Basic",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-5",
+      "name": "Mehrin Mostofa Sharlize",
+      "age": 12,
+      "gender": "W",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "partially",
+          "Vollständige Rezitation des Korans (30 Juz)": "partially",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "partially"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false,
+          "sadakah": false
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-6",
+      "name": "Safwat Ahmed Osmany",
+      "age": 10,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-7",
+      "name": "Shayam Mostofa Areez",
+      "age": 12,
+      "gender": "M",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "partially",
+          "Vollständige Rezitation des Korans (30 Juz)": "not_achieved",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "partially",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "partially"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": true,
+          "sadakah": true
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": true
+      }
+    },
+    {
+      "id": "std-1790712190242-8",
+      "name": "Tasneem Binte Tajul",
+      "age": 9,
+      "gender": "W",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-9",
+      "name": "Shanomi Osmany",
+      "age": 14,
+      "gender": "W",
+      "ageGroup": "13+",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Mindestens 2 Rak'a Tahajjud verrichten in einem der letzten 10 Tage des Ramadan": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah, die ersten 10 Verse der Sura Al-Mulk": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Fasten alle Fastentage": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false,
+          "sadakah": true
+        },
+        "customCriteria": "Tahajjud in last 10 days",
+        "verdict": "Advanced",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-10",
+      "name": "Sadia Hossain",
+      "age": 12,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-11",
+      "name": "Samir Kabir",
+      "age": 10,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-12",
+      "name": "Rushaid Tanjil",
+      "age": 9,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-13",
+      "name": "Mayameen Ahmed",
+      "age": 9,
+      "gender": "W",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-14",
+      "name": "Nishaj Araf Nasir",
+      "age": 14,
+      "gender": "M",
+      "ageGroup": "13+"
+    },
+    {
+      "id": "std-1790712190242-15",
+      "name": "Nafis Islam Khandoker",
+      "age": 12,
+      "gender": "M",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "partially",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "partially",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "Hat mutter in Hausarbeit geholfen",
+        "verdict": "Basic",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-16",
+      "name": "Nazifa Ahmed",
+      "age": 12,
+      "gender": "W",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": true,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Advanced",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-17",
+      "name": "Ariba Zimmermann",
+      "age": 7,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-18",
+      "name": "Amy Sharif",
+      "age": 10,
+      "gender": "W",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-19",
+      "name": "Anifa Ahmed",
+      "age": 7,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-20",
+      "name": "Tashika Binte Zaman",
+      "age": 9,
+      "gender": "W",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-21",
+      "name": "Marzia Hamidi",
+      "age": 11,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-22",
+      "name": "Sazdah Nasir Uddin",
+      "age": 8,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-23",
+      "name": "Muarrif Hossain",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-24",
+      "name": "Mustaiinah Hossain",
+      "age": 11,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-25",
+      "name": "Mahirah Miah",
+      "age": 7,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-26",
+      "name": "Ahyaan Miah",
+      "age": 9,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-27",
+      "name": "Orny Sharif",
+      "age": 8,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-28",
+      "name": "Zaara Islam",
+      "age": 6,
+      "gender": "W",
+      "ageGroup": "< 7",
+      "performance": {
+        "targetCriteria": {
+          "Basierend auf dem bereitgestellten Ramadan-Aktivitätenbuch": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-29",
+      "name": "Adifa Ahmed",
+      "age": 6,
+      "gender": "W",
+      "ageGroup": "< 7",
+      "performance": {
+        "targetCriteria": {
+          "Basierend auf dem bereitgestellten Ramadan-Aktivitätenbuch": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": false,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Entry",
+        "bonusPoints": false
+      }
+    },
+    {
+      "id": "std-1790712190242-30",
+      "name": "Unaisah Chowdhury",
+      "age": 6,
+      "gender": "W",
+      "ageGroup": "< 7"
+    },
+    {
+      "id": "std-1790712190242-31",
+      "name": "Mohammad Abu Bakr",
+      "age": 7,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-32",
+      "name": "Arina Mohamed",
+      "age": 8,
+      "gender": "W",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-33",
+      "name": "Afnan Mohamed",
+      "age": 10,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-34",
+      "name": "Raeesa Mahmud",
+      "age": 9,
+      "gender": "W",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-35",
+      "name": "Adiyaan",
+      "age": 11,
+      "gender": "M",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-36",
+      "name": "Liyana Ali",
+      "age": 6,
+      "gender": "W",
+      "ageGroup": "< 7"
+    },
+    {
+      "id": "std-1790712190242-37",
+      "name": "Ilham Haque",
+      "age": 13,
+      "gender": "M",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-38",
+      "name": "Liyana Haque",
+      "age": 11,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-39",
+      "name": "Manha Afroz",
+      "age": 11,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-40",
+      "name": "Zumana Islam",
+      "age": 12,
+      "gender": "W",
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": false,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "",
+        "verdict": "Basic",
+        "bonusPoints": true
+      }
+    },
+    {
+      "id": "std-1790712190242-41",
+      "name": "Sameet Islam",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-42",
+      "name": "Manha Hossain",
+      "age": 13,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-43",
+      "name": "Fareed Karim",
+      "age": 5,
+      "gender": "M",
+      "ageGroup": "< 7"
+    },
+    {
+      "id": "std-1790712190242-44",
+      "name": "Jayma Rahman",
+      "age": 13,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-45",
+      "name": "Jahin Rahman",
+      "age": 11,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-46",
+      "name": "Jiyad Rahman",
+      "age": 9,
+      "gender": "M",
+      "ageGroup": "9 - 10"
+    },
+    {
+      "id": "std-1790712190242-47",
+      "name": "Raiyan Ahmed",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-48",
+      "name": "Afifa Ahmed",
+      "age": 12,
+      "gender": "W",
+      "ageGroup": "11 - 13"
+    },
+    {
+      "id": "std-1790712190242-49",
+      "name": "Elham Hasan",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-50",
+      "name": "Rounaf Hossain",
+      "age": 7,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-51",
+      "name": "Mahbeer",
+      "age": 8,
+      "gender": "M",
+      "ageGroup": "7 - 8"
+    },
+    {
+      "id": "std-1790712190242-52",
+      "name": "Melissa",
+      "age": null,
+      "gender": "W",
+      "ageGroup": "Unassigned"
+    },
+    {
+      "id": "std-1790712190242-53",
+      "name": "Mahirah Chowdhury",
+      "age": null,
+      "gender": "W",
+      "ageGroup": "Unassigned"
+    },
+    {
+      "id": "std-1790712190242-54",
+      "name": "Abdullah",
+      "age": null,
+      "gender": "M",
+      "ageGroup": "Unassigned"
+    }
+  ],
+  "updatedAt": "2026-10-01T14:01:37.377Z"
+}
