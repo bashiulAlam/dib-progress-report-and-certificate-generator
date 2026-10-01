@@ -414,6 +414,37 @@
       "maxPossibleScore": 400,
       "academicPercent": 100,
       "classPerformancePercent": 97
+    },
+    {
+      "studentId": "std_1790861160824",
+      "firstName": "Zayan",
+      "familyName": "Hossain",
+      "level": "noorani",
+      "subLevel": "nl_9",
+      "scores": {
+        "subcat_ai_f1": 23,
+        "subcat_ai_f2": 24,
+        "subcat_ai_f3": 23,
+        "subcat_ai_f4": 23,
+        "subcat_qn_f1": 21,
+        "subcat_qn_f2": 25,
+        "subcat_qn_f3": 25,
+        "subcat_qn_f4": 25,
+        "subcat_punkt": 25,
+        "subcat_hw": 25,
+        "subcat_mitarb": 25,
+        "subcat_adhab": 25,
+        "sub_1789033549108": 98,
+        "sports_day": 25,
+        "science_club": 25,
+        "islamische_bildung": 25,
+        "co_1789064756155": 25
+      },
+      "syllabi": {},
+      "totalScore": 389,
+      "maxPossibleScore": 400,
+      "academicPercent": 95,
+      "classPerformancePercent": 100
     }
   ]
 }

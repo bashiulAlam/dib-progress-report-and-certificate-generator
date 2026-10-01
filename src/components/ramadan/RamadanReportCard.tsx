@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getHijriYear } from "@/data/ramadanDateUtils";
 
 export interface RamadanPerformanceData {
     studentId: string;
@@ -21,6 +22,7 @@ interface RamadanReportCardProps {
     issueDate: string;
     issuePlace?: string;
     address?: string;
+    competitionYear?: number;
 }
 
 export default function RamadanReportCard({
@@ -28,6 +30,7 @@ export default function RamadanReportCard({
     issueDate,
     issuePlace = "Berlin",
     address,
+    competitionYear,
 }: RamadanReportCardProps) {
     const hasBonus = Boolean(data.bonusAmount && String(data.bonusAmount).trim() !== "0");
 
@@ -108,12 +111,20 @@ export default function RamadanReportCard({
                         <h2 className="text-lg font-extrabold italic text-slate-900 tracking-tight leading-snug">
                             Der produktive Ramadan der Kinder
                         </h2>
+                        {/* Year Badge */}
+                        {competitionYear && (
+                            <div className="flex items-center justify-end gap-1.5 text-[10px] font-medium text-slate-500 pt-0.5">
+                                <span>{String(competitionYear).padStart(4, '0')} CE</span>
+                                <span>•</span>
+                                <span>{String(getHijriYear(competitionYear)).padStart(4, '0')} AH</span>
+                            </div>
+                        )}
                         <p className="text-[11px] font-semibold text-amber-800 tracking-wider">
                             Urkunde & Leistungsbeurteilung
                         </p>
                     </div>
                 </div>
-                
+
                 {/* Criteria Evaluation Table */}
                 <div className="mt-3">
                     <h3 className="text-xs font-bold text-gray-700 tracking-wider mb-2">
@@ -176,10 +187,10 @@ export default function RamadanReportCard({
                 {/* Spiritual Encouragement & Quran/Hadith Quote */}
                 <div className="mt-6 p-4 rounded-lg border-l-4 border-amber-600 bg-amber-50/40 text-gray-800 text-xs space-y-2">
                     <p className="italic font-serif text-gray-900">
-                        „...So wetteifert nach den guten Dingen.“
+                        Der Gesandte Allahs ﷺ sagte: „Wer Ramadan aus Glauben und in Hoffnung auf Allahs Lohn fastet, dem werden seine vergangenen Sünden vergeben.“
                     </p>
                     <p className="text-[10px] text-gray-600 font-semibold">
-                        — Sure Al-Baqarah (2:148)
+                        — Sahih al-Bukhari 38, Sahih Muslim 760
                     </p>
                     <p className="pt-1 text-gray-700 leading-relaxed">
                         Möge Allah (swt) deine Anstrengungen, dein Fasten und dein Streben nach Wissen in diesem gesegneten Monat reichlich belohnen. Behalte diesen Eifer bei und sei weiterhin ein Vorbild für deine Mitmenschen!
@@ -188,7 +199,7 @@ export default function RamadanReportCard({
             </div>
 
             {/* Footer Section */}
-            <div className="pt-6 border-t border-gray-200 mt-8">
+            <div className="pt-6 mt-8">
                 <div className="flex justify-between items-end">
                     {/* Place and Date */}
                     <div className="text-xs text-gray-700">

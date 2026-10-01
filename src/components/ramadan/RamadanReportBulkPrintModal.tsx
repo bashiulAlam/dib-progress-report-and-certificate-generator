@@ -9,12 +9,14 @@ interface RamadanReportBulkPrintModalProps {
     isOpen: boolean;
     onClose: () => void;
     studentsData: RamadanPerformanceData[];
+    competitionYear?: number;
 }
 
 export default function RamadanReportBulkPrintModal({
     isOpen,
     onClose,
     studentsData,
+    competitionYear,
 }: RamadanReportBulkPrintModalProps) {
     const [issueDate, setIssueDate] = useState<string>(
         new Date().toLocaleDateString("de-DE", {
@@ -209,6 +211,7 @@ export default function RamadanReportBulkPrintModal({
                                     issueDate={issueDate}
                                     issuePlace={issuePlace}
                                     address={address}
+                                    competitionYear={competitionYear}
                                 />
                             </div>
                         ))}

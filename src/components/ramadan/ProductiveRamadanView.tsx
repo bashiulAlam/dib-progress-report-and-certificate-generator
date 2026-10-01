@@ -452,15 +452,31 @@ export default function ProductiveRamadanView() {
 
                                     const getHijriYear = (gregorianYear: number): string => {
                                         try {
-                                            const sampleDate = new Date(gregorianYear, 3, 1);
-                                            const formatter = new Intl.DateTimeFormat("en-US-u-ca-islamic-uma", {
+                                            // Use March 15th (Month index 2) as a middle-ground estimate for Ramadan period
+                                            const sampleDate = new Date(gregorianYear, 2, 15);
+
+                                            const formatter = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura", {
                                                 year: "numeric",
                                             });
+
                                             const parts = formatter.formatToParts(sampleDate);
                                             const hijriYearPart = parts.find((p) => p.type === "year");
-                                            return hijriYearPart ? hijriYearPart.value : "";
+
+                                            // Remove non-numeric characters if any trailing text appears
+                                            return hijriYearPart ? hijriYearPart.value.replace(/\D/g, "") : "";
                                         } catch {
-                                            return "";
+                                            // Fallback for environments where islamic-umalqura is unsupported
+                                            try {
+                                                const sampleDate = new Date(gregorianYear, 2, 15);
+                                                const formatter = new Intl.DateTimeFormat("en-US-u-ca-islamic", {
+                                                    year: "numeric",
+                                                });
+                                                const parts = formatter.formatToParts(sampleDate);
+                                                const hijriYearPart = parts.find((p) => p.type === "year");
+                                                return hijriYearPart ? hijriYearPart.value.replace(/\D/g, "") : "";
+                                            } catch {
+                                                return "";
+                                            }
                                         }
                                     };
 
@@ -785,7 +801,7 @@ export default function ProductiveRamadanView() {
                                         customCriteria: e.target.value,
                                     }))
                                 }
-                                placeholder={`did one thing\ndid 2 things\ndid lots of good deeds`}
+                                placeholder={`Type in each additional task or note on a new line. For example:\n- Attended 5 prayers at the mosque\n- Read Quran daily\n- Helped with community service`}
                                 rows={3}
                                 className="w-full text-xs p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-emerald-600 focus:outline-none"
                             />
@@ -885,6 +901,7 @@ export default function ProductiveRamadanView() {
                     isOpen={isPrintModalOpen}
                     onClose={() => setIsPrintModalOpen(false)}
                     studentsData={participantsWithPerformance}
+                    competitionYear={competitionYear}
                 />
             )}
 
