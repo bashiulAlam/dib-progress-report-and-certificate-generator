@@ -17,25 +17,22 @@ import {
     Trash2,
     FileText,
     Printer,
+    RotateCcw,
 } from "lucide-react";
 import {
     DEFAULT_RAMADAN_AGE_GROUPS,
     DEFAULT_VERDICT_OPTIONS,
     RamadanAgeGroup,
     VerdictOption,
+    AdditionalCriterionOption,
+    DEFAULT_ADDITIONAL_CRITERIA
 } from "../../data/ramadanRequirements";
 import RamadanReportBulkPrintModal from "./RamadanReportBulkPrintModal";
 import { RamadanPerformanceData } from "./RamadanReportCard";
 
 export interface StudentPerformance {
     targetCriteria: Record<string, "fully" | "partially" | "not_achieved">;
-    additionalCriteria: {
-        quranLesen: boolean;
-        alleTageFasten: boolean;
-        tahajjud: boolean;
-        taraweeh: boolean;
-        uebernachtungMoschee: boolean;
-    };
+    additionalCriteria: Record<string, boolean>;
     customCriteria: string; // User input for additional tasks / notes
     verdict: string | null;
     bonusPoints: boolean;
@@ -66,6 +63,16 @@ export default function ProductiveRamadanView() {
     const [ageGroups, setAgeGroups] = useState<RamadanAgeGroup[]>(DEFAULT_RAMADAN_AGE_GROUPS);
     const [verdictOptions, setVerdictOptions] = useState<VerdictOption[]>(DEFAULT_VERDICT_OPTIONS);
     const [bonusPrizeMoney, setBonusPrizeMoney] = useState<number>(5);
+    const [additionalCriteriaConfig, setAdditionalCriteriaConfig] = useState<AdditionalCriterionOption[]>(() => {
+        if (typeof window === "undefined") return DEFAULT_ADDITIONAL_CRITERIA;
+
+        try {
+            const saved = localStorage.getItem("ramadan_additional_criteria");
+            return saved ? JSON.parse(saved) : DEFAULT_ADDITIONAL_CRITERIA;
+        } catch {
+            return DEFAULT_ADDITIONAL_CRITERIA;
+        }
+    });
 
     const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
     const [isPrintModalOpen, setIsPrintModalOpen] = useState<boolean>(false);
@@ -119,6 +126,18 @@ export default function ProductiveRamadanView() {
                 if (typeof parsed.bonusPrizeMoney === "number") setBonusPrizeMoney(parsed.bonusPrizeMoney);
             } catch (e) {
                 console.error("Error loading local storage state", e);
+            }
+        }
+
+        const savedCriteria = localStorage.getItem("ramadan_additional_criteria");
+        if (savedCriteria) {
+            try {
+                const parsedCriteria = JSON.parse(savedCriteria);
+                if (Array.isArray(parsedCriteria)) {
+                    setAdditionalCriteriaConfig(parsedCriteria);
+                }
+            } catch (e) {
+                console.error("Error loading additional criteria config", e);
             }
         }
     }, []);
@@ -255,7 +274,7 @@ export default function ProductiveRamadanView() {
                 if (!trimmed) return;
 
                 const delimiter = trimmed.includes(";") ? ";" : ",";
-                const cols = trimmed.split(delimiter).map((c) => c.replace(/^["']|["']$/g, "").trim());
+                const cols = trimmed.split(delimiter).map((c) => c.replace(/^['"]|['"]$/g, "").trim());
 
                 if (
                     idx === 0 &&
@@ -319,14 +338,15 @@ export default function ProductiveRamadanView() {
             initialTargetRatings[rule] = existing?.targetCriteria?.[rule] || "fully";
         });
 
+        const defaultAdditionalCriteria = Object.fromEntries(
+            additionalCriteriaConfig.map((item) => [item.id, false])
+        ) as Record<string, boolean>;
+
         setPerformanceDraft({
             targetCriteria: initialTargetRatings,
-            additionalCriteria: existing?.additionalCriteria || {
-                quranLesen: false,
-                alleTageFasten: false,
-                tahajjud: false,
-                taraweeh: false,
-                uebernachtungMoschee: false,
+            additionalCriteria: {
+                ...defaultAdditionalCriteria,
+                ...(existing?.additionalCriteria || {}),
             },
             customCriteria: existing?.customCriteria || "",
             verdict: existing?.verdict || null,
@@ -365,14 +385,12 @@ export default function ProductiveRamadanView() {
         });
     }, [students, searchTerm, selectedGroupFilter]);
 
-    // Format students with valid performances for PDF Report Cards
     const participantsWithPerformance = useMemo<RamadanPerformanceData[]>(() => {
         return students
             .filter((std) => std.performance && std.performance.verdict)
             .map((std) => {
                 const perf = std.performance!;
 
-                // 1. Target criteria ratings
                 const targetRules = Object.entries(perf.targetCriteria || {}).map(([rule, rating]) => {
                     const statusLabel =
                         rating === "fully"
@@ -383,21 +401,18 @@ export default function ProductiveRamadanView() {
                     return { criterion: rule, result: statusLabel };
                 });
 
-                // 2. Default checkbox activities
-                const extraActivitiesList: string[] = [];
-                if (perf.additionalCriteria?.quranLesen) extraActivitiesList.push("Vollständiges Qur'an lesen");
-                if (perf.additionalCriteria?.alleTageFasten) extraActivitiesList.push("Alle Tage Fasten");
-                if (perf.additionalCriteria?.tahajjud) extraActivitiesList.push("Tahajjud Gebete");
-                if (perf.additionalCriteria?.taraweeh) extraActivitiesList.push("Taraweeh Gebete");
-                if (perf.additionalCriteria?.uebernachtungMoschee) extraActivitiesList.push("Übernachtung in der Moschee");
+                const extraActivitiesList = additionalCriteriaConfig
+                    .filter((item) => {
+                        const criteriaRecord = perf.additionalCriteria as Record<string, boolean> | undefined;
+                        return criteriaRecord?.[item.id] === true;
+                    })
+                    .map((item) => item.label);
 
-                // 3. Process custom multiline entries (Convert newlines -> Array items)
                 const customTasksList = (perf.customCriteria || "")
                     .split("\n")
                     .map((line) => line.trim())
                     .filter((line) => line.length > 0);
 
-                // 4. Combine both lists cleanly with comma separators (NO brackets)
                 const allTasksCombined = [...extraActivitiesList, ...customTasksList];
                 const formattedAdditionalTasks = allTasksCombined.length > 0 ? allTasksCombined.join(", ") : undefined;
 
@@ -409,12 +424,12 @@ export default function ProductiveRamadanView() {
                     ageGroup: std.ageGroup !== "Unassigned" ? `Gruppe ${std.ageGroup}` : "Altersgruppe k.A.",
                     verdict: perf.verdict!,
                     criteriaResults: targetRules,
-                    additionalTasks: formattedAdditionalTasks, // Clean, comma-separated string
+                    additionalTasks: formattedAdditionalTasks,
                     bonusAmount: perf.bonusPoints ? `+${bonusPrizeMoney} € (Sonderbonus)` : undefined,
                     prizeMoney: `${prize},00 €`,
                 };
             });
-    }, [students, verdictOptions, bonusPrizeMoney]);
+    }, [students, verdictOptions, bonusPrizeMoney, additionalCriteriaConfig]);
 
     return (
         <div className="space-y-6">
@@ -733,21 +748,15 @@ export default function ProductiveRamadanView() {
                         <div className="space-y-3 pt-2 border-t">
                             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Mosque / Ramadan Activities</h4>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                {[
-                                    { key: "quranLesen", label: "Vollständige Quran Lesen" },
-                                    { key: "alleTageFasten", label: "Alle Tage Fasten" },
-                                    { key: "tahajjud", label: "Tahajjud" },
-                                    { key: "taraweeh", label: "Taraweeh" },
-                                    { key: "uebernachtungMoschee", label: "Übernachtung in der Moschee" },
-                                ].map((item) => (
-                                    <label key={item.key} className="flex items-center gap-2 p-2 rounded border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                                {additionalCriteriaConfig.map((item) => (
+                                    <label key={item.id} className="flex items-center gap-2 p-2 rounded border border-gray-200 hover:bg-gray-50 cursor-pointer">
                                         <input
                                             type="checkbox"
-                                            checked={(performanceDraft.additionalCriteria as any)[item.key]}
+                                            checked={Boolean((performanceDraft.additionalCriteria as Record<string, boolean> | undefined)?.[item.id])}
                                             onChange={(e) =>
                                                 setPerformanceDraft((prev) => ({
                                                     ...prev,
-                                                    additionalCriteria: { ...prev.additionalCriteria, [item.key]: e.target.checked },
+                                                    additionalCriteria: { ...prev.additionalCriteria, [item.id]: e.target.checked },
                                                 }))
                                             }
                                             className="rounded text-emerald-600"
@@ -887,10 +896,12 @@ export default function ProductiveRamadanView() {
                     ageGroups={ageGroups}
                     verdictOptions={verdictOptions}
                     bonusPrizeMoney={bonusPrizeMoney}
-                    onSave={(updatedGroups, updatedVerdicts, updatedBonus) => {
+                    additionalCriteriaConfig={additionalCriteriaConfig}
+                    onSave={(updatedGroups, updatedVerdicts, updatedBonus, updatedCriteria) => {
                         setAgeGroups(updatedGroups);
                         setVerdictOptions(updatedVerdicts);
                         setBonusPrizeMoney(updatedBonus);
+                        setAdditionalCriteriaConfig(updatedCriteria);
                         saveStateToStorage(students, competitionYear, updatedGroups, updatedVerdicts, updatedBonus);
                         setIsAdminOpen(false);
                     }}
@@ -907,6 +918,7 @@ function RamadanAdminModal({
     ageGroups,
     verdictOptions,
     bonusPrizeMoney,
+    additionalCriteriaConfig,
     onSave,
 }: {
     isOpen: boolean;
@@ -914,24 +926,28 @@ function RamadanAdminModal({
     ageGroups: RamadanAgeGroup[];
     verdictOptions: VerdictOption[];
     bonusPrizeMoney: number;
-    onSave: (groups: RamadanAgeGroup[], verdicts: VerdictOption[], bonus: number) => void;
+    additionalCriteriaConfig: AdditionalCriterionOption[];
+    onSave: (groups: RamadanAgeGroup[], verdicts: VerdictOption[], bonus: number, criteria: AdditionalCriterionOption[]) => void;
 }) {
-    const [activeTab, setActiveTab] = useState<"criteria" | "verdicts">("verdicts");
+    const [activeTab, setActiveTab] = useState<"criteria" | "verdicts" | "additional">("verdicts");
 
     const [verdictsState, setVerdictsState] = useState<VerdictOption[]>(verdictOptions);
     const [bonusState, setBonusState] = useState<number>(bonusPrizeMoney);
     const [rawRequirements, setRawRequirements] = useState<Record<string, string>>({});
+    const [criteriaList, setCriteriaList] = useState<AdditionalCriterionOption[]>(additionalCriteriaConfig);
+    const [newLabel, setNewLabel] = useState("");
 
     useEffect(() => {
         setVerdictsState(verdictOptions);
         setBonusState(bonusPrizeMoney);
+        setCriteriaList(additionalCriteriaConfig);
 
         const map: Record<string, string> = {};
         ageGroups.forEach((g) => {
             map[g.id] = g.requirements.join("\n");
         });
         setRawRequirements(map);
-    }, [isOpen, ageGroups, verdictOptions, bonusPrizeMoney]);
+    }, [isOpen, ageGroups, verdictOptions, bonusPrizeMoney, additionalCriteriaConfig]);
 
     const [newVerdictName, setNewVerdictName] = useState("");
     const [newVerdictPrize, setNewVerdictPrize] = useState(10);
@@ -964,6 +980,29 @@ function RamadanAdminModal({
         setVerdictsState((prev) => prev.filter((v) => v.id !== id));
     };
 
+    const handleSaveCriteria = (newList: AdditionalCriterionOption[]) => {
+        setCriteriaList(newList);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("ramadan_additional_criteria", JSON.stringify(newList));
+        }
+    };
+
+    const handleAddCriterion = () => {
+        if (!newLabel.trim()) return;
+        const id = newLabel.toLowerCase().replace(/[^a-z0-9]/g, "_") + "_" + Date.now();
+        const updated = [...criteriaList, { id, label: newLabel.trim() }];
+        handleSaveCriteria(updated);
+        setNewLabel("");
+    };
+
+    const handleRemoveCriterion = (id: string) => {
+        handleSaveCriteria(criteriaList.filter((item) => item.id !== id));
+    };
+
+    const handleResetCriteria = () => {
+        handleSaveCriteria(DEFAULT_ADDITIONAL_CRITERIA);
+    };
+
     const handleSaveAll = () => {
         const updatedAgeGroups = ageGroups.map((group) => {
             const rawText = rawRequirements[group.id] || "";
@@ -978,7 +1017,7 @@ function RamadanAdminModal({
             };
         });
 
-        onSave(updatedAgeGroups, verdictsState, bonusState);
+        onSave(updatedAgeGroups, verdictsState, bonusState, criteriaList);
     };
 
     return (
@@ -1011,6 +1050,15 @@ function RamadanAdminModal({
                             }`}
                     >
                         Age Group Target Criteria
+                    </button>
+                    <button
+                        onClick={() => setActiveTab("additional")}
+                        className={`pb-2 text-xs font-bold border-b-2 transition-colors cursor-pointer ${activeTab === "additional"
+                            ? "border-amber-500 text-amber-900"
+                            : "border-transparent text-gray-400 hover:text-gray-600"
+                            }`}
+                    >
+                        Additional Criteria
                     </button>
                 </div>
 
@@ -1129,6 +1177,52 @@ function RamadanAdminModal({
                                 />
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {activeTab === "additional" && (
+                    <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+                                Zusätzliche Kriterien (Admin Config)
+                            </h3>
+                            <button
+                                onClick={handleResetCriteria}
+                                className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800"
+                            >
+                                <RotateCcw className="w-3.5 h-3.5" /> Zurücksetzen
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {criteriaList.map((item) => (
+                                <div key={item.id} className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-200 text-xs">
+                                    <span className="font-medium text-slate-700">{item.label}</span>
+                                    <button
+                                        onClick={() => handleRemoveCriterion(item.id)}
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newLabel}
+                                onChange={(e) => setNewLabel(e.target.value)}
+                                placeholder="Neues Kriterium (z.B. Sadaqah Spende)..."
+                                className="flex-1 text-xs p-2 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-emerald-600"
+                            />
+                            <button
+                                onClick={handleAddCriterion}
+                                className="flex items-center gap-1 bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-emerald-800"
+                            >
+                                <Plus className="w-3.5 h-3.5" /> Hinzufügen
+                            </button>
+                        </div>
                     </div>
                 )}
 

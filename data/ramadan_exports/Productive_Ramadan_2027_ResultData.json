@@ -83,11 +83,6 @@
       "id": "verdict-3",
       "name": "Advanced",
       "prizeMoney": 35
-    },
-    {
-      "id": "verdict-1790717947859",
-      "name": "Maestro",
-      "prizeMoney": 50
     }
   ],
   "bonusPrizeMoney": 5,
@@ -123,7 +118,26 @@
       "name": "Mohammed Hallak",
       "age": 12,
       "gender": "M",
-      "ageGroup": "11 - 13"
+      "ageGroup": "11 - 13",
+      "performance": {
+        "targetCriteria": {
+          "5 tägliche Gebete und 8 Rak'a Tarawih-Gebete": "fully",
+          "Vollständige Rezitation des Korans (30 Juz)": "fully",
+          "Auswendiglernen: Ayat al-Kursi, Sayyidul Istighfar, die letzten 2 Verse der Sura Al-Baqarah": "fully",
+          "Tägliche Duas: Schlafengehen/Aufwachen, Haus Betreten/Verlassen, Toilette Betreten/Verlassen, Moschee Betreten/Verlassen": "fully",
+          "Mindestens 20 Tage fasten": "fully"
+        },
+        "additionalCriteria": {
+          "quranLesen": false,
+          "alleTageFasten": true,
+          "tahajjud": true,
+          "taraweeh": false,
+          "uebernachtungMoschee": false
+        },
+        "customCriteria": "did one thing\ndid 2 things\ndid lots of good deeds",
+        "verdict": "Advanced",
+        "bonusPoints": false
+      }
     },
     {
       "id": "std-1790712190242-3",
@@ -577,5 +591,5 @@
       "ageGroup": "Unassigned"
     }
   ],
-  "updatedAt": "2026-09-29T21:39:11.740Z"
+  "updatedAt": "2026-10-01T11:54:09.355Z"
 }

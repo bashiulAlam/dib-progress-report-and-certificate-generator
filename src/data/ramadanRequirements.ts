@@ -110,3 +110,18 @@ export const DEFAULT_VERDICT_OPTIONS: VerdictOption[] = [
     { id: "verdict-2", name: "Basic", prizeMoney: 25 },
     { id: "verdict-3", name: "Advanced", prizeMoney: 35 },
 ];
+
+export interface AdditionalCriterionOption {
+  id: string;
+  label: string;
+  defaultChecked?: boolean;
+}
+
+export const DEFAULT_ADDITIONAL_CRITERIA: AdditionalCriterionOption[] = [
+  { id: "quranLesen", label: "Vollständiges Qur'an lesen" },
+  { id: "alleTageFasten", label: "Alle Tage Fasten" },
+  { id: "tahajjud", label: "Tahajjud Gebete" },
+  { id: "taraweeh", label: "Taraweeh Gebete" },
+  { id: "uebernachtungMoschee", label: "Übernachtung in der Moschee" },
+  { id: "sadakah", label: "Sadakah" },
+];
