@@ -84,36 +84,36 @@ export default function RamadanReportCard({
                     </div>
                 </div>
 
-                {/* DIN 5008 Compliant Window Envelope Address Box */}
-                <div className="mt-4 mb-8 w-[90mm] min-h-[30mm] p-3 border border-gray-200 rounded-md bg-gray-50/50 print:bg-transparent">
-                    <p className="text-xs font-bold text-gray-800 uppercase tracking-wide">
-                        {data.studentName}
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                        <span className="font-semibold">Altersklasse:</span> {data.ageGroup}
-                    </p>
-                    <div className="mt-2 pt-2 border-t border-gray-200">
-                        <span className="text-[10px] uppercase tracking-wider text-gray-500 block font-semibold">
-                            Gesamtbeurteilung
-                        </span>
-                        <span className="text-xs font-bold text-emerald-800">
-                            {data.verdict}
-                        </span>
+                <div className="flex items-start justify-between gap-4 mt-4 mb-8">
+                    {/* DIN 5008 Compliant Window Envelope Address Box */}
+                    <div className="w-[85mm] min-h-[30mm] p-3 border border-gray-200 rounded-md bg-gray-50/50 print:bg-transparent">
+                        <p className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                            {data.studentName}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                            <span className="font-semibold">Altersklasse:</span> {data.ageGroup}
+                        </p>
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                            <span className="text-[10px] uppercase tracking-wider text-gray-500 block font-semibold">
+                                Gesamtbeurteilung
+                            </span>
+                            <span className="text-xs font-bold text-emerald-800">
+                                {data.verdict}
+                            </span>
+                        </div>
                     </div>
-                </div>
 
-                {/* Center Title */}
-                <div className="text-center mb-2 space-y-0.5">
-                    <div className="pt-3">
-                        <h2 className="text-xl font-extrabold italic text-gray-900 tracking-tight">
+                    {/* Title Block */}
+                    <div className="text-right space-y-0.5">
+                        <h2 className="text-lg font-extrabold italic text-slate-900 tracking-tight leading-snug">
                             Der produktive Ramadan der Kinder
                         </h2>
-                        <p className="text-xs font-medium text-amber-800 tracking-widest mt-1">
+                        <p className="text-[11px] font-semibold text-amber-800 tracking-wider">
                             Urkunde & Leistungsbeurteilung
                         </p>
                     </div>
                 </div>
-
+                
                 {/* Criteria Evaluation Table */}
                 <div className="mt-3">
                     <h3 className="text-xs font-bold text-gray-700 tracking-wider mb-2">
