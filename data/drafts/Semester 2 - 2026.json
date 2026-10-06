@@ -445,6 +445,29 @@
       "maxPossibleScore": 400,
       "academicPercent": 95,
       "classPerformancePercent": 100
+    },
+    {
+      "studentId": "std_1791310628148",
+      "firstName": "Safwat Ahmed",
+      "familyName": "Osmany",
+      "level": "madani_nesab",
+      "scores": {
+        "arabische_literatur": 80,
+        "mizhan": 90,
+        "masader": 75,
+        "heoar": 35,
+        "arabische_schrift": 40,
+        "seerah": 87,
+        "pünktlichkeit": 25,
+        "hausaufgaben": 25,
+        "mitarbeit": 25,
+        "adhab": 25
+      },
+      "syllabi": {},
+      "totalScore": 420,
+      "maxPossibleScore": 500,
+      "academicPercent": 80,
+      "classPerformancePercent": 100
     }
   ]
 }
