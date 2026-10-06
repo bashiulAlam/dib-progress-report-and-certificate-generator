@@ -103,25 +103,41 @@ export interface VerdictOption {
     id: string;
     name: string;
     prizeMoney: number;
+    description?: string; // e.g. "Du hast alle zugewiesenen Aufgaben erfolgreich gemeistert."
 }
 
 export const DEFAULT_VERDICT_OPTIONS: VerdictOption[] = [
-    { id: "verdict-1", name: "Entry", prizeMoney: 15 },
-    { id: "verdict-2", name: "Basic", prizeMoney: 25 },
-    { id: "verdict-3", name: "Advanced", prizeMoney: 35 },
+    {
+        id: "verdict-1",
+        name: "Entry",
+        prizeMoney: 15,
+        description: "Du hast fleißig mitgemacht, auch wenn nicht alle Aufgaben vollständig erfüllt wurden."
+    },
+    {
+        id: "verdict-2",
+        name: "Basic",
+        prizeMoney: 25,
+        description: "Du hast alle dir zugewiesenen Grundaufgaben erfolgreich gemeistert."
+    },
+    {
+        id: "verdict-3",
+        name: "Advanced",
+        prizeMoney: 35,
+        description: "Du hast nicht nur alle Grundaufgaben erfüllt, sondern auch zusätzliche Taten vollbracht!"
+    },
 ];
 
 export interface AdditionalCriterionOption {
-  id: string;
-  label: string;
-  defaultChecked?: boolean;
+    id: string;
+    label: string;
+    defaultChecked?: boolean;
 }
 
 export const DEFAULT_ADDITIONAL_CRITERIA: AdditionalCriterionOption[] = [
-  { id: "quranLesen", label: "Vollständiges Qur'an lesen" },
-  { id: "alleTageFasten", label: "Alle Tage Fasten" },
-  { id: "tahajjud", label: "Tahajjud Gebete" },
-  { id: "taraweeh", label: "Taraweeh Gebete" },
-  { id: "uebernachtungMoschee", label: "Übernachtung in der Moschee" },
-  { id: "sadakah", label: "Sadakah" },
+    { id: "quranLesen", label: "Vollständiges Qur'an lesen" },
+    { id: "alleTageFasten", label: "Alle Tage Fasten" },
+    { id: "tahajjud", label: "Tahajjud Gebete" },
+    { id: "taraweeh", label: "Taraweeh Gebete" },
+    { id: "uebernachtungMoschee", label: "Übernachtung in der Moschee" },
+    { id: "sadakah", label: "Sadakah" },
 ];
