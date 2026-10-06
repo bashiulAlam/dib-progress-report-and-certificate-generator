@@ -423,9 +423,13 @@ export default function ProductiveRamadanView() {
                     studentName: std.name,
                     ageGroup: std.ageGroup !== "Unassigned" ? `Gruppe ${std.ageGroup}` : "Altersgruppe k.A.",
                     verdict: perf.verdict!,
+                    verdictDescription: verdictOptions.find((v) => v.name === perf.verdict)?.description,
                     criteriaResults: targetRules,
                     additionalTasks: formattedAdditionalTasks,
-                    bonusAmount: perf.bonusPoints ? `+${bonusPrizeMoney} € (Sonderbonus)` : undefined,
+                    bonusAmount: perf.bonusPoints ? `+${bonusPrizeMoney} €` : undefined,
+                    bonusDescription: perf.bonusPoints
+                        ? "Zusätzlich wurde ein Sonderbonus für besonders vorbildlichen Einsatz verliehen."
+                        : undefined,
                     prizeMoney: `${prize},00 €`,
                 };
             });
@@ -983,7 +987,7 @@ function RamadanAdminModal({
         setNewVerdictPrize(10);
     };
 
-    const handleUpdateVerdict = (id: string, field: "name" | "prizeMoney", value: any) => {
+    const handleUpdateVerdict = (id: string, field: "name" | "prizeMoney" | "description", value: any) => {
         setVerdictsState((prev) =>
             prev.map((v) =>
                 v.id === id
@@ -1107,32 +1111,44 @@ function RamadanAdminModal({
                                 {verdictsState.map((v) => (
                                     <div
                                         key={v.id}
-                                        className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between gap-3"
+                                        className="p-3 bg-gray-50 border border-gray-200 rounded-lg space-y-2"
                                     >
-                                        <div className="flex-1">
+                                        <div className="flex items-center justify-between gap-3">
                                             <input
                                                 type="text"
                                                 value={v.name}
                                                 onChange={(e) => handleUpdateVerdict(v.id, "name", e.target.value)}
-                                                className="w-full text-xs font-bold text-gray-800 bg-white border border-gray-300 px-2.5 py-1 rounded focus:outline-none"
+                                                className="flex-1 text-xs font-bold text-gray-800 bg-white border border-gray-300 px-2.5 py-1 rounded focus:outline-none"
+                                                placeholder="Verdict Name"
                                             />
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-xs font-bold text-gray-500">€</span>
+                                                <input
+                                                    type="number"
+                                                    min={0}
+                                                    value={v.prizeMoney}
+                                                    onChange={(e) => handleUpdateVerdict(v.id, "prizeMoney", e.target.value)}
+                                                    className="w-20 text-xs font-bold text-emerald-800 bg-white border border-gray-300 px-2 py-1 rounded focus:outline-none"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteVerdict(v.id)}
+                                                className="text-gray-400 hover:text-rose-600 p-1 rounded cursor-pointer"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-xs font-bold text-gray-500">€</span>
+
+                                        {/* Verdict Justification / Description Input */}
+                                        <div>
                                             <input
-                                                type="number"
-                                                min={0}
-                                                value={v.prizeMoney}
-                                                onChange={(e) => handleUpdateVerdict(v.id, "prizeMoney", e.target.value)}
-                                                className="w-20 text-xs font-bold text-emerald-800 bg-white border border-gray-300 px-2 py-1 rounded focus:outline-none"
+                                                type="text"
+                                                value={v.description || ""}
+                                                onChange={(e) => handleUpdateVerdict(v.id, "description", e.target.value)}
+                                                placeholder="Begründung/Beschreibung (z.B. Du hast alle Grundaufgaben gemeistert)..."
+                                                className="w-full text-[11px] text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded focus:outline-none focus:border-amber-400"
                                             />
                                         </div>
-                                        <button
-                                            onClick={() => handleDeleteVerdict(v.id)}
-                                            className="text-gray-400 hover:text-rose-600 p-1 rounded cursor-pointer"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1255,6 +1271,6 @@ function RamadanAdminModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

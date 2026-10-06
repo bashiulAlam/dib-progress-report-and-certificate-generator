@@ -8,12 +8,14 @@ export interface RamadanPerformanceData {
     studentName: string;
     ageGroup: string; // e.g. "Altersgruppe 8–10 Jahre"
     verdict: string; // e.g. "Mit ausgezeichnetem Erfolg teilgenommen"
+    verdictDescription?: string; // Optional description of the verdict
     criteriaResults: Array<{
         criterion: string;
         result: string;
     }>;
     additionalTasks?: string; // Optional task note, defaults to 'n.z.' if empty
     bonusAmount?: string | number; // Only rendered if present and > 0
+    bonusDescription?: string; // e.g. "Sonderbonus für herausragendes Engagement"
     prizeMoney?: string; // e.g. "15,00 €" or "Einkaufsgutschein 20 €"
 }
 
@@ -97,12 +99,19 @@ export default function RamadanReportCard({
                             <span className="font-semibold">Altersklasse:</span> {data.ageGroup}
                         </p>
                         <div className="mt-2 pt-2 border-t border-gray-200">
-                            <span className="text-[10px] uppercase tracking-wider text-gray-500 block font-semibold">
+                            <span className="text-[10px] uppercase tracking-wider text-gray-500 block font-semibold mb-0.5">
                                 Gesamtbeurteilung
                             </span>
-                            <span className="text-xs font-bold text-emerald-800">
-                                {data.verdict}
-                            </span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-xs font-bold text-emerald-800">
+                                    {data.verdict}
+                                </span>
+                                {data.bonusAmount && (
+                                    <span className="text-[9px] font-semibold bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.2 rounded-full">
+                                        {data.bonusAmount} Sonderbonus
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -130,56 +139,72 @@ export default function RamadanReportCard({
                     <h3 className="text-xs font-bold text-gray-700 tracking-wider mb-2">
                         Ergebnisübersicht & Kriterien
                     </h3>
-                    <table className="w-full border-collapse text-xs border border-gray-300">
+                    <table className="w-full border-collapse text-[11px] border border-gray-300">
                         <thead>
                             <tr className="bg-gray-100 text-gray-800 text-left border-b border-gray-300">
-                                <th className="p-2.5 font-bold border-r border-gray-300">Bewertungskriterium</th>
-                                <th className="p-2.5 font-bold w-1/3">Erreichte Leistung</th>
+                                <th className="py-1.5 px-2 font-bold border-r border-gray-300">
+                                    Bewertungskriterium
+                                </th>
+                                <th className="py-1.5 px-2 font-bold w-1/3">
+                                    Erreichte Leistung
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
                             {data.criteriaResults.map((item, idx) => (
                                 <tr key={idx} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                                    <td className="p-2.5 text-gray-800 font-medium border-r border-gray-200">
+                                    <td className="py-1.5 px-2 text-gray-800 font-normal border-r border-gray-200 leading-snug">
                                         {item.criterion}
                                     </td>
-                                    <td className="p-2.5 text-gray-900 font-semibold">{item.result}</td>
+                                    <td className="py-1.5 px-2 text-gray-900 font-semibold leading-snug">
+                                        {item.result}
+                                    </td>
                                 </tr>
                             ))}
 
                             {/* Additional Tasks Section */}
                             <tr className="bg-white">
-                                <td className="p-2.5 text-gray-800 font-medium border-r border-gray-200">
+                                <td className="py-1.5 px-2 text-gray-800 font-normal border-r border-gray-200 leading-snug">
                                     Zusatzaufgaben / Sonderleistungen
                                 </td>
-                                <td className="p-2.5 text-gray-700">
-                                    {data.additionalTasks && data.additionalTasks.trim() !== "" && (
+                                <td className="py-1.5 px-2 text-gray-700 leading-snug">
+                                    {data.additionalTasks && data.additionalTasks.trim() !== "" ? (
                                         <span className="text-slate-700">{data.additionalTasks}</span>
+                                    ) : (
+                                        <span className="text-gray-400 italic">Keine</span>
                                     )}
                                 </td>
                             </tr>
-
-                            {/* Conditional Bonus Row */}
-                            {hasBonus && (
-                                <tr className="bg-amber-50/60">
-                                    <td className="p-2.5 text-amber-900 font-bold border-r border-gray-200">
-                                        Bonusleistungen
-                                    </td>
-                                    <td className="p-2.5 text-amber-900 font-extrabold">
-                                        {data.bonusAmount}
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 </div>
 
+                <div className="border-l-2 border-amber-400 pl-3 py-1 space-y-1 my-2 text-left">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                        <span>Beurteilung: <span className="text-amber-800">{data.verdict}</span></span>
+                        {data.bonusAmount && (
+                            <span className="text-[10px] font-semibold bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded">
+                                {data.bonusAmount} Sonderbonus
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Combined Minimal Explanation */}
+                    {(data.verdictDescription || data.bonusDescription) && (
+                        <p className="text-[10px] text-slate-600 leading-snug">
+                            {data.verdictDescription}
+                            {data.verdictDescription && data.bonusDescription && " "}
+                            {data.bonusDescription}
+                        </p>
+                    )}
+                </div>
+
                 {/* Prize Money Award Section */}
-                <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-md flex justify-between items-center">
-                    <span className="text-xs font-bold text-emerald-900 uppercase">
+                <div className="mt-2.5 px-3 py-1.5 bg-emerald-50/80 border border-emerald-200/60 rounded-lg flex items-center justify-between text-xs">
+                    <span className="font-semibold text-emerald-950">
                         Anerkennung / Preisgeld:
                     </span>
-                    <span className="text-sm font-extrabold text-emerald-900">
+                    <span className="font-extrabold text-emerald-900">
                         {data.prizeMoney || "n.z."}
                     </span>
                 </div>
