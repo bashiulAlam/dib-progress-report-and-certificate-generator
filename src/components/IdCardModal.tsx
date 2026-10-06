@@ -47,37 +47,55 @@ export default function IdCardModal({
             const text = event.target?.result as string;
             if (!text) return;
 
-            const lines = text.split(/\r\n|\n/);
+            const lines = text.split(/\r\n|\n/).filter((l) => l.trim().length > 0);
             const parsed: ParsedStudent[] = [];
+            if (lines.length === 0) return;
 
-            lines.forEach((line, index) => {
-                const trimmed = line.trim();
-                if (!trimmed) return;
+            // Determine delimiter from the first line (header or data)
+            const sample = lines[0];
+            const delimiter = sample.includes(";") ? ";" : ",";
 
-                const delimiter = trimmed.includes(";") ? ";" : ",";
-                const cols = trimmed.split(delimiter).map((c) => c.replace(/^["']|["']$/g, "").trim());
+            // Parse header if present and map indices for last/first name
+            const headerCols = lines[0].split(delimiter).map((c) => c.replace(/^['\"]|['\"]$/g, "").trim());
+            const normalize = (s: string) => s.toLowerCase().replace(/\s|_|-/g, "");
 
-                if (cols.length < 2) return;
+            const lastKeys = ["familyname", "family", "lastname", "nachname", "surname"];
+            const firstKeys = ["firstname", "givenname", "vorname", "first", "given"];
 
-                const val1 = cols[0];
-                const val2 = cols[1];
+            let lastNameIdx: number | null = null;
+            let firstNameIdx: number | null = null;
 
-                if (
-                    index === 0 &&
-                    (val1.toLowerCase().includes("nachname") ||
-                        val1.toLowerCase().includes("last") ||
-                        val1.toLowerCase().includes("name") ||
-                        val2.toLowerCase().includes("vorname") ||
-                        val2.toLowerCase().includes("first"))
-                ) {
-                    return;
-                }
-
-                parsed.push({
-                    lastName: val1,
-                    firstName: val2,
-                });
+            headerCols.forEach((h, i) => {
+                const n = normalize(h);
+                if (lastKeys.some((k) => n.includes(k))) lastNameIdx = i;
+                if (firstKeys.some((k) => n.includes(k))) firstNameIdx = i;
             });
+
+            // Heuristic: if any header column contains name-like tokens, treat first row as header
+            const isHeader = headerCols.some((h) => {
+                const n = normalize(h);
+                return lastKeys.concat(firstKeys).some((k) => n.includes(k) || n === k);
+            });
+
+            const startIndex = isHeader ? 1 : 0;
+
+            for (let idx = startIndex; idx < lines.length; idx++) {
+                const line = lines[idx].trim();
+                if (!line) continue;
+                const cols = line.split(delimiter).map((c) => c.replace(/^['\"]|['\"]$/g, "").trim());
+                if (cols.length === 0) continue;
+
+                // If we have mapped indices, pick from them, otherwise fallback to first two columns
+                const lIdx = lastNameIdx ?? 0;
+                const fIdx = firstNameIdx ?? 1;
+
+                const last = cols[lIdx] ?? cols[0] ?? "";
+                const first = cols[fIdx] ?? cols[1] ?? "";
+
+                if (!last && !first) continue;
+
+                parsed.push({ lastName: last, firstName: first });
+            }
 
             setStudents(parsed);
         };
