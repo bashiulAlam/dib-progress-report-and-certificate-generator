@@ -126,7 +126,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                                             return (
                                                 <tr key={subCat.id} className="hover:bg-gray-50">
                                                     <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-800">
-                                                        {subCat.name}
+                                                        {subCat.name} ({subCat.maxPoints} Punkte)
                                                     </td>
                                                     <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-900 font-bold text-right">
                                                         {display}
@@ -138,7 +138,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                                 ) : (
                                     <tr key={sub.id} className={`${isGrade ? "bg-amber-50" : "hover:bg-gray-50"}`}>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-800">
-                                            {translateSubject(sub.name)}
+                                            {translateSubject(sub.name)}{!isGrade && typeof sub.maxPoints !== 'undefined' && sub.maxPoints !== null ? ` (${sub.maxPoints} Punkte)` : ''}
                                         </td>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-900 font-bold text-right">
                                             {student.scores[sub.id] ?? "n.z."}
@@ -163,7 +163,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                                 return (
                                     <tr key={opt.id}>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-800">
-                                            {opt.name}
+                                            {opt.name} ({opt.maxPoints} Punkte)
                                         </td>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-900 font-bold text-right">
                                             {display}
@@ -188,7 +188,7 @@ const ReportCardContent = ({ student, session, config, levelConfig, subLevelConf
                                 return (
                                     <tr key={act.id}>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-800">
-                                            {act.name}
+                                            {act.name} ({act.maxPoints} Punkte)
                                         </td>
                                         <td className="border border-[#005C3C] px-2.5 py-1 text-[11px] text-gray-900 font-bold text-right">
                                             {display}
@@ -268,6 +268,7 @@ export default function StudentReportCard({ student, session, config, onClose, b
     const coCurricularActivities = config.coCurricular?.activities ?? [];
     const optionalSubjects = levelConfig?.optionalSubjects ?? [];
 
+    const shouldRenderCoCurricular = student.level !== "madani_nesab";
     const activeOptionalSubjects = optionalSubjects.filter(
         (opt) => student.scores[opt.id] !== undefined && student.scores[opt.id] !== null
     );
@@ -275,7 +276,7 @@ export default function StudentReportCard({ student, session, config, onClose, b
     const contentDensity =
         (levelConfig?.subjects?.length ?? 0) +
         (activeOptionalSubjects?.length ?? 0) +
-        (coCurricularActivities?.length ?? 0);
+        (shouldRenderCoCurricular ? coCurricularActivities?.length ?? 0 : 0);
 
     const densityPenalty = Math.max(0, contentDensity - 4) * 1.2;
 
@@ -291,7 +292,7 @@ export default function StudentReportCard({ student, session, config, onClose, b
         subLevelConfig,
         totalScore,
         maxPossibleScore,
-        coCurricularActivities,
+        coCurricularActivities: shouldRenderCoCurricular ? coCurricularActivities : [],
         activeOptionalSubjects,
         logoHeight,
         academyFontSize,

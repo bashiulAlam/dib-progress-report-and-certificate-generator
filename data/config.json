@@ -50,13 +50,6 @@
           "includeInTotal": true
         },
         {
-          "id": "seerah",
-          "name": "Seerah",
-          "maxPoints": 100,
-          "isOptional": true,
-          "includeInTotal": false
-        },
-        {
           "id": "class_performance",
           "name": "Class Performance",
           "maxPoints": 100,
@@ -141,6 +134,22 @@
               "maxPoints": 25
             }
           ]
+        },
+        {
+          "id": "sub_1791395947166",
+          "name": "Seerah",
+          "maxPoints": 100,
+          "evaluationType": "points",
+          "gradeOptions": [
+            "Sehr Gut",
+            "Gut",
+            "Befriedigend",
+            "Ausreichend",
+            "Mangelhaft"
+          ],
+          "hasCustomSyllabus": false,
+          "isOptional": true,
+          "includeInTotal": false
         }
       ]
     },

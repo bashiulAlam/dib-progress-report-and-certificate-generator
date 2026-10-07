@@ -322,6 +322,7 @@ export default function HomeSPA() {
     if (activeEditIndex === null || !config || !session?.students) return false;
     const student = session.students[activeEditIndex];
     const levelConfig = config.levels.find((l) => l.id === student.level);
+    const isMadaniNesabLevel = student.level === "madani_nesab";
 
     if (!student.firstName.trim() || !student.familyName.trim()) {
       setValidationError("First and family names are required.");
@@ -356,7 +357,7 @@ export default function HomeSPA() {
       }
     }
 
-    if (config.coCurricular?.activities) {
+    if (!isMadaniNesabLevel && config.coCurricular?.activities) {
       for (const act of config.coCurricular.activities) {
         const val = student.scores[act.id];
         if (typeof val === "number" && (val < 0 || val > act.maxPoints)) {
@@ -431,6 +432,8 @@ export default function HomeSPA() {
     activeEditIndex !== null && activeEditIndex < currentStudents.length
       ? currentStudents[activeEditIndex]
       : null;
+
+  const isMadaniNesabLevel = currentStudent?.level === "madani_nesab";
 
   const currentLevelConfig = currentStudent
     ? config.levels.find((l) => l.id === currentStudent.level)
@@ -975,7 +978,7 @@ export default function HomeSPA() {
                 })}
 
                 {/* Co-Curricular Block */}
-                {config.coCurricular?.activities && config.coCurricular.activities.length > 0 && (
+                {!isMadaniNesabLevel && config.coCurricular?.activities && config.coCurricular.activities.length > 0 && (
                   <div className="border border-blue-200 rounded-lg p-3 bg-blue-50/30 space-y-2">
                     <h4 className="font-semibold text-sm text-blue-900 border-b border-blue-200 pb-1">
                       Co-Curricular Activities

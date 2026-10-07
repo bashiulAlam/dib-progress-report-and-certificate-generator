@@ -1,5 +1,9 @@
 import { AppConfig, LevelConfig, StudentScore } from "./types";
 
+export function shouldIncludeCoCurricularForLevel(levelId?: string): boolean {
+  return levelId !== "madani_nesab";
+}
+
 export function calculateStudentTotal(
   student: StudentScore,
   levelConfig?: LevelConfig | null,
@@ -14,9 +18,11 @@ export function calculateStudentTotal(
     };
   }
 
+  const includeCoCurricular = shouldIncludeCoCurricularForLevel(student.level);
+
   // 1. Identify Co-Curricular IDs dynamically
   const coCurricularIds = new Set(
-    config?.coCurricular?.activities?.map((act) => act.id) || []
+    includeCoCurricular ? config?.coCurricular?.activities?.map((act) => act.id) || [] : []
   );
 
   // 2. Map dynamic Subject & Sub-Category structures from levelConfig
