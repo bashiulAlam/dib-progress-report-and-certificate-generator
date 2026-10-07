@@ -2,7 +2,8 @@
 
 import React from "react";
 
-export type SpecialCertType = "extraordinary" | "class_performance";
+// 1. Add 'cocurricular' to SpecialCertType
+export type SpecialCertType = "extraordinary" | "class_performance" | "cocurricular";
 
 interface SpecialAchievementCardProps {
     studentName: string;
@@ -10,6 +11,8 @@ interface SpecialAchievementCardProps {
     termPeriod: string;
     locationAndDate: string;
     certType: SpecialCertType;
+    // Optional score display if you want percentage shown on certificate
+    achievementPercent?: number;
 }
 
 export const SpecialAchievementCard: React.FC<SpecialAchievementCardProps> = ({
@@ -18,7 +21,22 @@ export const SpecialAchievementCard: React.FC<SpecialAchievementCardProps> = ({
     termPeriod,
     locationAndDate,
     certType,
+    achievementPercent,
 }) => {
+    // Dynamic titles based on category
+    const getCertTitle = () => {
+        switch (certType) {
+            case "extraordinary":
+                return "für hervorragende Prüfungsergebnisse";
+            case "class_performance":
+                return "für vorbildliche Leistungen";
+            case "cocurricular":
+                return "für herausragende außerschulische Aktivitäten";
+            default:
+                return "";
+        }
+    };
+
     return (
         <div className="relative w-[297mm] h-[210mm] bg-white overflow-hidden box-border mx-auto print:m-0 print:w-full print:h-screen font-serif text-gray-900">
             {/* Background Template */}
@@ -42,32 +60,27 @@ export const SpecialAchievementCard: React.FC<SpecialAchievementCardProps> = ({
 
             {/* Overlay Content Box */}
             <div className="relative z-10 w-full h-full flex flex-col justify-between p-10 text-center">
-                {/* Top Header Spacing (Clears Academy Logo & Name in Background) */}
+                {/* Top Header */}
                 <div className="pt-48 space-y-1">
                     <h1 className="text-6xl font-extrabold tracking-wider text-[#A67C1E]">
                         ZERTIFIKAT
                     </h1>
 
                     <div className="flex items-center justify-center gap-3 pt-1">
-                        {/* Left Ornament */}
                         <svg className="w-5 h-5 text-[#A67C1E] fill-current" viewBox="0 0 24 24">
                             <path d="M12,2 L14,7 L19,4 L16,9 L21,12 L16,15 L19,20 L14,17 L12,22 L10,17 L5,20 L8,15 L3,12 L8,9 L5,4 L10,7 Z" />
                         </svg>
 
                         <h2 className="text-2xl font-bold text-[#144428]">
-                            {certType === "extraordinary"
-                                ? "für hervorragende Prüfungsergebnisse"
-                                : "für vorbildliche Leistungen"}
+                            {getCertTitle()}
                         </h2>
 
-                        {/* Right Ornament */}
                         <svg className="w-5 h-5 text-[#A67C1E] fill-current rotate-180" viewBox="0 0 24 24">
                             <path d="M12,2 L14,7 L19,4 L16,9 L21,12 L16,15 L19,20 L14,17 L12,22 L10,17 L5,20 L8,15 L3,12 L8,9 L5,4 L10,7 Z" />
                         </svg>
                     </div>
 
-                    <p className="pt-4 text-lg italic pt-1 text-gray-700">Hiermit wird bestätigt, dass</p>
-
+                    <p className="pt-4 text-lg italic text-gray-700">Hiermit wird bestätigt, dass</p>
                 </div>
 
                 {/* Student Name & Class */}
@@ -92,37 +105,42 @@ export const SpecialAchievementCard: React.FC<SpecialAchievementCardProps> = ({
                         {termPeriod}
                     </p>
 
-                    {/* Achievement Description Statement (From TeX source) */}
+                    {/* Achievement Statement */}
                     <div className="max-w-2xl mx-auto pt-2">
-                        {certType === "extraordinary" ? (
+                        {certType === "extraordinary" && (
                             <p className="text-sm font-bold leading-relaxed text-gray-800">
                                 in Anerkennung der hervorragenden Prüfungsergebnisse
                                 <br />
                                 mit diesem Zertifikat ausgezeichnet wird.
                             </p>
-                        ) : (
+                        )}
+                        {certType === "class_performance" && (
                             <p className="text-sm font-bold leading-relaxed text-gray-800">
                                 durch kontinuierliches Engagement, zuverlässige Mitarbeit
                                 <br />
                                 und vorbildliches Verhalten überzeugt hat.
                             </p>
                         )}
+                        {certType === "cocurricular" && (
+                            <p className="text-sm font-bold leading-relaxed text-gray-800">
+                                für herausragende Leistungen und aktives Engagement bei
+                                <br />
+                                außerschulischen Aktivitäten ausgezeichnet wird
+                                {achievementPercent ? ` (${achievementPercent}%)` : ""}.
+                            </p>
+                        )}
                     </div>
                 </div>
 
-                {/* Blessing & Footer Block */}
+                {/* Footer Section */}
                 <div className="pt-2 space-y-6 pb-4">
-                    {/* Encouragement Blessing */}
                     <p className="text-xs italic text-gray-700 max-w-2xl mx-auto leading-relaxed">
                         Möge Allah (SWT) Ihnen weiterhin Erfolg schenken, Ihren Weg mit Wissen, Standhaftigkeit
                         <br />
                         und guten Taten erleuchten und Sie auf Ihrem weiteren Lebensweg segnen.
                     </p>
 
-                    {/* Symmetrical Footer: Ort & Datum / Signature */}
-                    {/* Symmetrical Footer: Ort & Datum / Signature */}
                     <div className="flex justify-between items-end max-w-xl mx-auto w-full px-4 pt-2">
-                        {/* Left Footer: Ort und Datum */}
                         <div className="text-center w-48">
                             <p className="text-xs font-semibold text-gray-800 border-b border-gray-600 pb-0.5 min-h-[18px]">
                                 {locationAndDate}
@@ -132,7 +150,6 @@ export const SpecialAchievementCard: React.FC<SpecialAchievementCardProps> = ({
                             </p>
                         </div>
 
-                        {/* Right Footer: Headmaster Signature */}
                         <div className="text-center w-48">
                             <div className="h-10 flex items-end justify-center mb-0.5">
                                 <img

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
-import { calculateStudentTotal } from "@/lib/utils";
+import { AppConfig, ExamSession } from "@/lib/types";
 import { Award, X, Printer, Loader2 } from "lucide-react";
 import KidsCertificateCard from "./KidsCertificateCard";
 import SpecialAchievementCard, { SpecialCertType } from "./SpecialAchievementCard";
@@ -15,21 +14,35 @@ interface CertificateModalProps {
     config: AppConfig;
 }
 
+/**
+ * Checks whether a level ID or name corresponds to the secondary track (Madani Nesab).
+ */
+const isMadaniNesabLevel = (levelIdOrName?: string): boolean => {
+    if (!levelIdOrName) return false;
+    const normalized = levelIdOrName.toLowerCase().trim();
+    return normalized.includes("madani") || normalized.includes("nesab");
+};
+
 export default function CertificateModal({
     isOpen,
     onClose,
     session,
     config,
 }: CertificateModalProps) {
-    const [certCategory, setCertCategory] = useState<"kids" | "extraordinary" | "class_performance">("kids");
+    // Category Union
+    const [certCategory, setCertCategory] = useState<
+        "kids" | "extraordinary" | "class_performance" | "cocurricular"
+    >("kids");
+
     const [selectedLevel, setSelectedLevel] = useState<string>("ALL");
     const [locationAndDate, setLocationAndDate] = useState("Berlin, den 30.08.2026");
 
-    // Filtering Controls
+    // Threshold Controls
     const [extraordinaryThreshold, setExtraordinaryThreshold] = useState<number>(100);
     const [classPerformanceTarget, setClassPerformanceTarget] = useState<number>(100);
+    const [cocurricularThreshold, setCocurricularThreshold] = useState<number>(80);
 
-    // Manual Name Mode (For Kids Certs)
+    // Manual Name Mode for Kids Certificates
     const [useCustomNames, setUseCustomNames] = useState(false);
     const [customNamesInput, setCustomNamesInput] = useState("");
 
@@ -48,12 +61,9 @@ export default function CertificateModal({
         const rawStudents = session.students || [];
 
         return rawStudents.filter((std) => {
-            // Level Filter
             if (selectedLevel !== "ALL" && std.level !== selectedLevel) return false;
 
-            const levelConfig = config.levels.find((l) => l.id === std.level);
-
-            // Category 1: Extraordinary Result
+            // Category: Extraordinary Result
             if (certCategory === "extraordinary") {
                 const studentPercent =
                     std.academicPercent ??
@@ -64,7 +74,7 @@ export default function CertificateModal({
                 return studentPercent >= extraordinaryThreshold;
             }
 
-            // Category 2: Class Performance Result
+            // Category: Class Performance
             if (certCategory === "class_performance") {
                 const classPerfPercent =
                     std.classPerformancePercent ??
@@ -73,11 +83,51 @@ export default function CertificateModal({
                 return classPerfPercent >= classPerformanceTarget;
             }
 
+            // Category: Co-Curricular Activities
+            if (certCategory === "cocurricular") {
+                // Skip students evaluated purely under the Madani Nesab track
+                if (isMadaniNesabLevel(std.level)) {
+                    return false;
+                }
+
+                // 1. Calculate maximum possible co-curricular score from config
+                const coCurricularConfig = (config as any)?.coCurricular;
+                const activities: Array<{ id: string; maxPoints: number }> =
+                    coCurricularConfig?.activities || [];
+
+                const totalMaxCoCurricularPoints = activities.reduce(
+                    (sum, act) => sum + (act.maxPoints || 0),
+                    0
+                );
+
+                // 2. Sum student's earned points across all configured activities
+                let studentCoCurricularScore = 0;
+
+                if (std.scores) {
+                    activities.forEach((act) => {
+                        const actScore = Number(std.scores?.[act.id] || 0);
+                        studentCoCurricularScore += actScore;
+                    });
+                }
+
+                // Fallback if cocurricularPercent is directly set on student object
+                let cocurricularPercent = (std as any).cocurricularPercent;
+
+                if (cocurricularPercent === undefined || cocurricularPercent === null) {
+                    cocurricularPercent = totalMaxCoCurricularPoints > 0
+                        ? Math.round((studentCoCurricularScore / totalMaxCoCurricularPoints) * 100)
+                        : 0;
+                }
+
+                return cocurricularPercent >= cocurricularThreshold;
+            }
+
             return true;
         });
     };
 
     const getTargetItems = (): Array<{ name: string; classNameStr: string }> => {
+        // If Kids Certificate and Manual Name Input mode is active
         if (certCategory === "kids" && useCustomNames) {
             return customNamesInput
                 .split("\n")
@@ -90,9 +140,15 @@ export default function CertificateModal({
         return filtered.map((std) => {
             const levelConfig = config.levels.find((l) => l.id === std.level);
             const subLevelConfig = levelConfig?.subLevels?.find((sl) => sl.id === std.subLevel);
-            const classNameStr = levelConfig
+            
+            let classNameStr = levelConfig
                 ? `${levelConfig.name}${subLevelConfig ? ` (${subLevelConfig.name})` : ""}`
                 : std.level;
+
+            // Append Madani Nesab indicator if student is dual-enrolled
+            if ((std as any).isDualEnrolledMadani && !isMadaniNesabLevel(std.level)) {
+                classNameStr += " & Madani Nesab";
+            }
 
             return {
                 name: `${std.firstName} ${std.familyName}`,
@@ -125,7 +181,6 @@ export default function CertificateModal({
 
     return (
         <>
-            {/* --- UI Configuration Modal --- */}
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 print:hidden">
                 <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl border border-gray-200">
                     <div className="flex items-center justify-between border-b pb-3 mb-4">
@@ -143,7 +198,7 @@ export default function CertificateModal({
                     </div>
 
                     <div className="space-y-4">
-                        {/* Certificate Type Picker */}
+                        {/* Certificate Category Selector */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-700 mb-1">
                                 Certificate Category
@@ -156,10 +211,36 @@ export default function CertificateModal({
                                 <option value="kids">Kinder Zertifikat (Kids Certificate)</option>
                                 <option value="extraordinary">Extraordinary Result (Hervorragende Prüfungsergebnisse)</option>
                                 <option value="class_performance">Class Performance (Vorbildliche Leistungen)</option>
+                                <option value="cocurricular">Co-Curricular Activities (Außerschulische Aktivität)</option>
                             </select>
                         </div>
 
-                        {/* Common: Ort und Datum */}
+                        {/* Custom Name List Input for Kids Certificates */}
+                        {certCategory === "kids" && (
+                            <div className="bg-slate-50 p-3 rounded border border-slate-200 space-y-2">
+                                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-800">
+                                    <input
+                                        type="checkbox"
+                                        checked={useCustomNames}
+                                        onChange={(e) => setUseCustomNames(e.target.checked)}
+                                        className="rounded text-amber-600 focus:ring-amber-500"
+                                    />
+                                    Enter Manual Name List (One name per line)
+                                </label>
+
+                                {useCustomNames && (
+                                    <textarea
+                                        rows={4}
+                                        value={customNamesInput}
+                                        onChange={(e) => setCustomNamesInput(e.target.value)}
+                                        placeholder={"Max Mustermann\nErika Mustermann\nAli Yilmaz"}
+                                        className="w-full border rounded p-2 text-xs font-mono bg-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* Ort und Datum */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-700 mb-1">
                                 Ort und Datum (Place & Date)
@@ -173,24 +254,26 @@ export default function CertificateModal({
                             />
                         </div>
 
-                        {/* Class Level Selector */}
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1">
-                                Filter Class Level
-                            </label>
-                            <select
-                                value={selectedLevel}
-                                onChange={(e) => setSelectedLevel(e.target.value)}
-                                className="w-full border rounded p-2 text-sm bg-white"
-                            >
-                                <option value="ALL">All Levels ({session.students?.length || 0} students)</option>
-                                {config.levels.map((lvl) => (
-                                    <option key={lvl.id} value={lvl.id}>
-                                        {lvl.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {/* Class Level Selector (Hidden when manual names are active) */}
+                        {(!useCustomNames || certCategory !== "kids") && (
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                    Filter Class Level
+                                </label>
+                                <select
+                                    value={selectedLevel}
+                                    onChange={(e) => setSelectedLevel(e.target.value)}
+                                    className="w-full border rounded p-2 text-sm bg-white"
+                                >
+                                    <option value="ALL">All Levels ({session.students?.length || 0} students)</option>
+                                    {config.levels.map((lvl) => (
+                                        <option key={lvl.id} value={lvl.id}>
+                                            {lvl.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         {/* Dynamic Controls based on Category */}
                         {certCategory === "extraordinary" && (
@@ -235,39 +318,25 @@ export default function CertificateModal({
                             </div>
                         )}
 
-                        {/* Custom Name List option for Kids Certificate */}
-                        {certCategory === "kids" && (
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-4">
-                                    <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="source"
-                                            checked={!useCustomNames}
-                                            onChange={() => setUseCustomNames(false)}
-                                        />
-                                        From Current Session
-                                    </label>
-                                    <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
-                                        <input
-                                            type="radio"
-                                            name="source"
-                                            checked={useCustomNames}
-                                            onChange={() => setUseCustomNames(true)}
-                                        />
-                                        Custom Name List
-                                    </label>
-                                </div>
-
-                                {useCustomNames && (
-                                    <textarea
-                                        rows={3}
-                                        value={customNamesInput}
-                                        onChange={(e) => setCustomNamesInput(e.target.value)}
-                                        placeholder="Enter student names (one per line)..."
-                                        className="w-full border rounded p-2 text-sm font-mono bg-white"
+                        {/* Co-Curricular Threshold Input */}
+                        {certCategory === "cocurricular" && (
+                            <div className="bg-amber-50 p-3 rounded border border-amber-200 space-y-2">
+                                <label className="block text-xs font-semibold text-amber-900">
+                                    Co-Curricular Score Percentage Threshold (%)
+                                </label>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        value={cocurricularThreshold}
+                                        onChange={(e) => setCocurricularThreshold(Number(e.target.value))}
+                                        className="w-24 border rounded p-1.5 text-sm bg-white font-bold"
                                     />
-                                )}
+                                    <span className="text-xs text-amber-800">
+                                        Includes students with Co-Curricular score <strong>≥ {cocurricularThreshold}%</strong>.
+                                    </span>
+                                </div>
                             </div>
                         )}
 
@@ -308,7 +377,7 @@ export default function CertificateModal({
                 </div>
             </div>
 
-            {/* --- Printable Portal Container --- */}
+            {/* Printable Portal */}
             {mounted &&
                 printableItems.length > 0 &&
                 createPortal(
