@@ -460,9 +460,9 @@ export default function HomeSPA() {
   // State for controlling the printable exam sheet data
   const handleGeneratePrint = (sheet: ExamQuestionSheet) => {
     setActivePrintSheet(sheet);
-    setIsQuestionModalOpen(false);
+    // Modal stays open because we don't set isQuestionModalOpen(false)
 
-    // Double frame delay guarantees full React Portal render before opening print dialog
+    // Trigger normal in-app printing via portal
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setTimeout(() => {
@@ -484,6 +484,12 @@ export default function HomeSPA() {
             className="h-16 w-auto object-contain"
           />
           <h2 className="text-sm font-semibold text-gray-700">
+            Darul Ihsan Berlin e.V.
+          </h2>
+        </div>
+
+        <div className="flex flex-col items-center gap-1">
+          <h2 className="text-4xl font-semibold text-gray-700">
             {config.academyName}
           </h2>
         </div>
