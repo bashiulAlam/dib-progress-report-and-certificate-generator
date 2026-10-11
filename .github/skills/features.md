@@ -193,3 +193,29 @@ These would be useful future additions:
 - Mobile-friendly interface for field evaluation
 - Integration between academic and Ramadan modules
 - Report card templates with alternate themes
+
+### Semester Final Question Generator (Noorani)
+
+The app includes a print-ready exam question sheet generator for the Noorani level.
+
+**Purpose:** Create semester final question papers by subject, with customizable prompts, max marks, evaluation type, and printable layout.
+
+**Key flows:**
+- Open the "Semester Final Question" action from the main control panel
+- Select the term title and Noorani sub-level/class
+- Add question entries per subject area such as Qaida Nooraniyah, General Islamic Studies, and other non-optional core Noorani subjects
+- Set question max points and choose between simple mark/comment evaluation or matrix-based Tajweed/recitation grading
+- Attach reference images to individual questions when needed
+- Generate the sheet and trigger the browser print flow for a clean PDF export
+
+**Important behaviors:**
+- Only non-optional, non-grade, non-class-performance, non-co-curricular subjects are included by default
+- Questions are grouped by subject and printed as separate subject pages
+- Each subject page includes a metadata bar for level, student, examiner, and date
+- Printable output keeps page layout optimized for physical printing and PDF export
+
+**Key implementation files:**
+- `src/components/ExamQuestionModal.tsx` — question builder modal and generation logic
+- `src/components/QuestionSheetPrintable.tsx` — print-oriented layout for the final exam sheet
+
+### 1. Student Progress Reporting
