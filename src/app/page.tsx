@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AppConfig, ExamSession, StudentScore } from "@/lib/types";
+import { createPortal } from "react-dom";
+import { AppConfig, ExamSession, StudentScore, ExamQuestionSheet } from "@/lib/types";
 import {
   Eye,
   FilePlus,
@@ -29,6 +30,8 @@ import BulkPrintModal from "@/components/BulkPrintModal";
 import CertificateModal from "@/components/CertificateModal";
 import IdCardModal from "@/components/IdCardModal";
 import ProductiveRamadanView from "@/components/ramadan/ProductiveRamadanView";
+import ExamQuestionModal from "@/components/ExamQuestionModal";
+import { QuestionSheetPrintable } from "@/components/QuestionSheetPrintable";
 
 const DRAFT_STORAGE_KEY = "progress_report_unsaved_session";
 const ACTIVE_FILE_KEY = "progress_report_active_file";
@@ -44,6 +47,7 @@ export default function HomeSPA() {
   const [showBulkPrintModal, setShowBulkPrintModal] = useState(false);
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const [isIdCardModalOpen, setIsIdCardModalOpen] = useState<boolean>(false);
+  const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
 
   const [activeFileName, setActiveFileName] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -89,12 +93,17 @@ export default function HomeSPA() {
   const [selectedSubLevelId, setSelectedSubLevelId] = useState<string>("ALL");
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  // exam print sheet state
+  const [activePrintSheet, setActivePrintSheet] = useState<ExamQuestionSheet | null>(null);
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     Promise.all([
       fetch("/api/config").then((res) => (res.ok ? res.json() : null)),
       fetch("/api/drafts").then((res) => (res.ok ? res.json() : [])),
     ])
       .then(([configData, draftsData]) => {
+        setMounted(true);
         if (configData) {
           setConfig(configData);
         }
@@ -448,11 +457,26 @@ export default function HomeSPA() {
       ? currentStudents[studentToDeleteIndex]
       : null;
 
+  // State for controlling the printable exam sheet data
+  const handleGeneratePrint = (sheet: ExamQuestionSheet) => {
+    setActivePrintSheet(sheet);
+    // Modal stays open because we don't set isQuestionModalOpen(false)
+
+    // Trigger normal in-app printing via portal
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      });
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8 print:hidden">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto flex justify-between items-center mb-8 bg-white p-6 rounded-lg border shadow-xs">
-        {/* Left Column: Logo + Academy Name underneath */}
+        {/* Left Column: Logo + Academy Name */}
         <div className="flex flex-col items-center gap-1">
           <img
             src="/assets/dib-logo.png"
@@ -460,23 +484,31 @@ export default function HomeSPA() {
             className="h-16 w-auto object-contain"
           />
           <h2 className="text-sm font-semibold text-gray-700">
+            Darul Ihsan Berlin e.V.
+          </h2>
+        </div>
+
+        <div className="flex flex-col items-center gap-1">
+          <h2 className="text-4xl font-semibold text-gray-700">
             {config.academyName}
           </h2>
         </div>
 
-        {/* Right Column: Title + Current File underneath */}
-        <div className="flex flex-col items-end gap-0.5">
+        {/* Right Column: Title + Current File + Question Sheet Action */}
+        <div className="flex flex-col items-end gap-2">
           <h1 className="text-2xl font-bold text-amber-900">
             {activeTab === "progress"
               ? "Progress Report and Certificate Generator"
               : "Productive Ramadan for Kids Result Generator"}
           </h1>
-          {activeTab === "progress" && (
-            <p className="text-xs text-gray-500">
-              Current File:{" "}
-              <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
-            </p>
-          )}
+          <div className="flex items-center gap-3">
+            {activeTab === "progress" && (
+              <p className="text-xs text-gray-500">
+                Current File:{" "}
+                <span className="font-semibold text-blue-600">{activeDisplayFile}</span>
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -488,25 +520,31 @@ export default function HomeSPA() {
             type="button"
             disabled={activeTab === "progress"}
             onClick={() => setActiveTab("progress")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all shadow-xs ${
-              activeTab === "progress"
-                ? "bg-blue-600 text-white cursor-default"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 cursor-pointer"
-            }`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all shadow-xs ${activeTab === "progress"
+              ? "bg-blue-600 text-white cursor-default"
+              : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 cursor-pointer"
+              }`}
           >
             <BarChart2 className="w-4 h-4" />
             <span>Progress Reports</span>
           </button>
 
           <button
+            onClick={() => setIsQuestionModalOpen(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-md transition-colors shadow-xs cursor-pointer"
+          >
+            <FileText size={14} />
+            <span>Semester Final Question</span>
+          </button>
+
+          <button
             type="button"
             disabled={activeTab === "ramadan"}
             onClick={() => setActiveTab("ramadan")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all shadow-xs ${
-              activeTab === "ramadan"
-                ? "bg-amber-500 text-slate-950 font-bold cursor-default"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 cursor-pointer"
-            }`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold transition-all shadow-xs ${activeTab === "ramadan"
+              ? "bg-amber-500 text-slate-950 font-bold cursor-default"
+              : "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 cursor-pointer"
+              }`}
           >
             <Moon className="w-4 h-4 text-amber-600" />
             <span>Productive Ramadan Report</span>
@@ -589,7 +627,7 @@ export default function HomeSPA() {
             <div className="flex items-center gap-2">
               <button
                 onClick={openNewStudentModal}
-                className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 font-medium"
+                className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 font-medium cursor-pointer"
               >
                 <UserPlus size={16} /> Add Student Result
               </button>
@@ -597,14 +635,14 @@ export default function HomeSPA() {
 
             <button
               onClick={() => setShowBulkPrintModal(true)}
-              className="flex items-center gap-1.5 border border-gray-300 bg-white text-gray-700 px-3.5 py-2 rounded text-sm hover:bg-gray-50 font-medium shadow-xs"
+              className="flex items-center gap-1.5 border border-gray-300 bg-white text-gray-700 px-3.5 py-2 rounded text-sm hover:bg-gray-50 font-medium shadow-xs cursor-pointer"
             >
               <Printer size={16} className="text-blue-600" /> Bulk Print Reports
             </button>
 
             <button
               onClick={() => setIsCertModalOpen(true)}
-              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium px-3.5 py-2 rounded-md text-sm transition-colors shadow-sm"
+              className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium px-3.5 py-2 rounded-md text-sm transition-colors shadow-sm cursor-pointer"
             >
               <Award className="h-4 w-4" />
               <span>Certificates</span>
@@ -626,7 +664,7 @@ export default function HomeSPA() {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -714,7 +752,7 @@ export default function HomeSPA() {
                         <td className="p-4 text-right space-x-2">
                           <button
                             onClick={() => setSelectedPrintStudent(std)}
-                            className="p-1 border rounded hover:bg-blue-50 text-blue-600"
+                            className="p-1 border rounded hover:bg-blue-50 text-blue-600 cursor-pointer"
                             title="Preview & Print Report Card"
                           >
                             <Eye size={16} />
@@ -726,13 +764,13 @@ export default function HomeSPA() {
                               setIsNewStudent(false);
                               setValidationError(null);
                             }}
-                            className="p-1 border rounded hover:bg-gray-100 text-gray-600"
+                            className="p-1 border rounded hover:bg-gray-100 text-gray-600 cursor-pointer"
                           >
                             <Edit3 size={16} />
                           </button>
                           <button
                             onClick={() => setStudentToDeleteIndex(originalIndex)}
-                            className="p-1 border rounded hover:bg-red-50 text-red-600"
+                            className="p-1 border rounded hover:bg-red-50 text-red-600 cursor-pointer"
                             title="Delete Student Result"
                           >
                             <Trash2 size={16} />
@@ -770,13 +808,13 @@ export default function HomeSPA() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setStudentToDeleteIndex(null)}
-                className="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
                 Abbrechen
               </button>
               <button
                 onClick={confirmDeleteStudent}
-                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 cursor-pointer"
               >
                 Endgültig löschen
               </button>
@@ -856,7 +894,7 @@ export default function HomeSPA() {
                     updated[activeEditIndex] = student;
                     setSession({ ...session, students: updated });
                   }}
-                  className="w-full border p-1.5 rounded text-sm bg-white"
+                  className="w-full border p-1.5 rounded text-sm bg-white cursor-pointer"
                 >
                   {config.levels.map((lvl) => (
                     <option key={lvl.id} value={lvl.id}>
@@ -877,7 +915,7 @@ export default function HomeSPA() {
                       updated[activeEditIndex].subLevel = e.target.value;
                       setSession({ ...session, students: updated });
                     }}
-                    className="w-full border p-1.5 rounded text-sm bg-white font-medium text-blue-900"
+                    className="w-full border p-1.5 rounded text-sm bg-white font-medium text-blue-900 cursor-pointer"
                   >
                     {currentLevelConfig.subLevels.map((subLvl) => (
                       <option key={subLvl.id} value={subLvl.id}>
@@ -914,7 +952,7 @@ export default function HomeSPA() {
                           <select
                             value={String(currentStudent.scores[sub.id] ?? "")}
                             onChange={(e) => handleScoreChange(sub.id, e.target.value, true)}
-                            className="w-full border p-1 rounded text-sm bg-white font-medium"
+                            className="w-full border p-1 rounded text-sm bg-white font-medium cursor-pointer"
                           >
                             <option value="">Select Grade...</option>
                             {sub.gradeOptions?.map((grade) => (
@@ -1013,19 +1051,19 @@ export default function HomeSPA() {
               <div className="flex gap-2">
                 <button
                   onClick={cancelEdit}
-                  className="px-4 py-2 border rounded text-sm text-red-600 hover:bg-red-50"
+                  className="px-4 py-2 border rounded text-sm text-red-600 hover:bg-red-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => validateAndSaveEntry(true)}
-                  className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+                  className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 cursor-pointer"
                 >
                   <Plus size={16} /> Save & Add Another
                 </button>
                 <button
                   onClick={() => validateAndSaveEntry(false)}
-                  className="flex items-center gap-1 bg-emerald-700 text-white px-4 py-2 rounded text-sm hover:bg-emerald-800"
+                  className="flex items-center gap-1 bg-emerald-700 text-white px-4 py-2 rounded text-sm hover:bg-emerald-800 cursor-pointer"
                 >
                   <Check size={16} /> Save Student Result
                 </button>
@@ -1043,7 +1081,7 @@ export default function HomeSPA() {
               <h3 className="text-lg font-bold">Saved Session Files</h3>
               <button
                 onClick={() => setShowLoadModal(false)}
-                className="p-1 text-gray-400 hover:text-gray-700 rounded-lg"
+                className="p-1 text-gray-400 hover:text-gray-700 rounded-lg cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -1071,13 +1109,13 @@ export default function HomeSPA() {
                         }
                         setShowLoadModal(false);
                       }}
-                      className="flex items-center gap-2 text-left flex-1 font-medium text-gray-800 hover:text-blue-600"
+                      className="flex items-center gap-2 text-left flex-1 font-medium text-gray-800 hover:text-blue-600 cursor-pointer"
                     >
                       <FileText size={16} className="text-blue-600 shrink-0" /> {file}
                     </button>
                     <button
                       onClick={() => handleDeleteFile(file)}
-                      className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded shrink-0"
+                      className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded shrink-0 cursor-pointer"
                       title="Delete File"
                     >
                       <Trash2 size={16} />
@@ -1088,7 +1126,7 @@ export default function HomeSPA() {
             </div>
             <button
               onClick={() => setShowLoadModal(false)}
-              className="w-full border p-2 rounded text-sm text-gray-600 hover:bg-gray-50"
+              className="w-full border p-2 rounded text-sm text-gray-600 hover:bg-gray-50 cursor-pointer"
             >
               Close
             </button>
@@ -1129,6 +1167,28 @@ export default function HomeSPA() {
         onClose={() => setIsIdCardModalOpen(false)}
         defaultAcademyName={config.academyName}
       />
+
+      {/* Exam Question Sheet Generator Input Modal */}
+      {isQuestionModalOpen && (
+        <ExamQuestionModal
+          config={config}
+          onClose={() => setIsQuestionModalOpen(false)}
+          onGeneratePrint={handleGeneratePrint}
+        />
+      )}
+
+      {/* Printable Sheet View - Portaled to document.body */}
+      {mounted &&
+        activePrintSheet &&
+        createPortal(
+          <div className="hidden print:block print:absolute print:left-0 print:top-0 print:w-full print:bg-white print:z-[99999]">
+            <QuestionSheetPrintable
+              sheet={activePrintSheet}
+              config={config}
+            />
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

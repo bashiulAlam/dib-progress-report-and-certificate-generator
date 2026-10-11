@@ -1,4 +1,5 @@
 export type EvaluationType = "points" | "grade";
+export type QuestionEvaluationType = "matrix" | "simple";
 
 // 1. Base Sub-Structures
 export interface SubCategory {
@@ -79,4 +80,26 @@ export interface ExamSession {
   term: string;
   date: string;
   students: StudentScore[];
+}
+
+export interface QuestionItem {
+  id: string;
+  questionText: string;
+  imageUrl?: string;
+  maxPoints: number;
+  questionEvaluationType: QuestionEvaluationType;
+}
+
+export interface SubjectQuestionGroup {
+  subjectId: string;
+  subjectName: string;
+  totalMaxPoints: number;
+  questions: QuestionItem[];
+}
+
+export interface ExamQuestionSheet {
+  term: string; // e.g., "Semester 9 - 1. Prüfung 2026"
+  levelId: string;
+  subLevelId?: string;
+  subjectGroups: SubjectQuestionGroup[];
 }
